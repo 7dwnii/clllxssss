@@ -1,0 +1,5443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style title="Default style" description="" user_selectable="1" base_version_id="2020970" export_version="2">
+  <assets/>
+  <templates>
+    <template title="PAGE_CONTAINER" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[<!DOCTYPE html>
+<html id="XF" lang="{$xf.language.language_code}" dir="{$xf.language.text_direction}"
+	data-app="public"
+	data-template="{$template}"
+	data-container-key="{$containerKey}"
+	data-content-key="{$contentKey}"
+	data-logged-in="{{ $xf.visitor.user_id ? 'true' : 'false' }}"
+	data-cookie-prefix="{$xf.cookie.prefix}"
+	data-csrf="{{ csrf_token()|escape('js') }}"
+	class="has-no-js {{ $template ? 'template-' . $template : '' }}"
+	{{ $xf.runJobs ? ' data-run-jobs=""' : '' }}>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<script data-ad-client="ca-pub-5075061253329800" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>	<link href='https://fonts.googleapis.com/earlyaccess/droidarabickufi.css' rel='stylesheet' type='text/css'/>
+	<xf:set var="$siteName" value="{$xf.options.boardTitle}" />
+	<xf:set var="$h1"><xf:h1 fallback="{$siteName}" /></xf:set>
+	<xf:set var="$description"><xf:description /></xf:set>
+
+	<title><xf:title formatter="%s | %s" fallback="{$xf.options.boardTitle}" page="{$pageNumber}" /></title>
+
+	<link rel="manifest" href="{{ base_url('webmanifest.json') }}">
+	<xf:if is="property('metaThemeColor')">
+		<meta name="theme-color" content="{{ parse_less_color(property('metaThemeColor')) }}" />
+	</xf:if>
+
+	<meta name="apple-mobile-web-app-title" content="{{ $xf.options.boardShortTitle ?: $xf.options.boardTitle }}">
+	<xf:if is="property('publicIconUrl')">
+		<link rel="apple-touch-icon" href="{{ base_url(property('publicIconUrl', true)) }}">
+	<xf:elseif is="property('publicMetadataLogoUrl')" />
+		<link rel="apple-touch-icon" href="{{ base_url(property('publicMetadataLogoUrl')) }}" />
+	</xf:if>
+
+	<xf:foreach loop="$head" value="$headTag">
+		{$headTag}
+	</xf:foreach>
+
+	<xf:if is="!$head.meta_site_name && $siteName is not empty">
+		<xf:macro template="metadata_macros" name="site_name" arg-siteName="{$siteName}" arg-output="{{ true }}" />
+	</xf:if>
+	<xf:if is="!$head.meta_type">
+		<xf:macro template="metadata_macros" name="type" arg-type="website" arg-output="{{ true }}" />
+	</xf:if>
+	<xf:if is="!$head.meta_title">
+		<xf:macro template="metadata_macros" name="title" arg-title="{{ page_title() ?: $siteName }}" arg-output="{{ true }}" />
+	</xf:if>
+	<xf:if is="!$head.meta_description && $description is not empty && $pageDescriptionMeta">
+		<xf:macro template="metadata_macros" name="description" arg-description="{$description}" arg-output="{{ true }}" />
+	</xf:if>
+	<xf:if is="!$head.meta_share_url">
+		<xf:macro template="metadata_macros" name="share_url" arg-shareUrl="{$xf.fullUri}" arg-output="{{ true }}" />
+	</xf:if>
+	<xf:if is="!$head.meta_image_url && property('publicMetadataLogoUrl')">
+		<xf:macro template="metadata_macros" name="image_url"
+			arg-imageUrl="{{ base_url(property('publicMetadataLogoUrl'), true) }}"
+			arg-output="{{ true }}" />
+	</xf:if>
+
+	<xf:macro template="helper_js_global" name="head" arg-app="public" />
+
+	<xf:if is="property('publicFaviconUrl')">
+		<link rel="icon" type="image/png" href="{{ base_url(property('publicFaviconUrl'), true) }}" sizes="32x32" />
+	</xf:if>
+	<xf:include template="google_analytics" />
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MCFH6N1WR0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MCFH6N1WR0');
+</script>
+</head>
+<body data-template="{$template}">
+
+<div class="p-pageWrapper" id="top">
+
+<xf:if contentcheck="true">
+	<div class="p-staffBar">
+		<div class="p-staffBar-inner hScroller" data-xf-init="h-scroller">
+			<div class="hScroller-scroll">
+			<xf:contentcheck>
+				<xf:if is="$xf.visitor.is_moderator && $xf.session.unapprovedCounts.total">
+					<a href="{{ link('approval-queue') }}" class="p-staffBar-link badgeContainer badgeContainer--highlighted" data-badge="{$xf.session.unapprovedCounts.total|number}">
+						{{ phrase('approval_queue') }}
+					</a>
+				</xf:if>
+
+				<xf:if is="$xf.visitor.is_moderator && !$xf.options.reportIntoForumId && $xf.session.reportCounts.total">
+					<a href="{{ link('reports') }}"
+						class="p-staffBar-link badgeContainer badgeContainer--visible {{ ($xf.session.reportCounts.total && ($xf.session.reportCounts.lastBuilt > $xf.session.reportLastRead) OR $xf.session.reportCounts.assigned) ? ' badgeContainer--highlighted' : '' }}"
+						data-badge="{{ $xf.session.reportCounts.assigned ? $xf.session.reportCounts.assigned|number . ' / ' . $xf.session.reportCounts.total|number : $xf.session.reportCounts.total|number }}"
+						title="{{ $xf.session.reportCounts.lastBuilt ? phrase('last_report_update:')|for_attr . ' ' . date_time($xf.session.reportCounts.lastBuilt) : '' }}">
+						{{ phrase('reports') }}
+					</a>
+				</xf:if>
+
+				<xf:if contentcheck="true">
+					<a class="p-staffBar-link menuTrigger" data-xf-click="menu" data-xf-key="alt+m" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true">{{ phrase('moderator') }}</a>
+					<div class="menu" data-menu="menu" aria-hidden="true">
+						<div class="menu-content">
+							<h4 class="menu-header">{{ phrase('moderator_tools') }}</h4>
+							<xf:contentcheck>
+							<!--[XF:mod_tools_menu:top]-->
+							<xf:if is="$xf.visitor.is_moderator">
+								<a href="{{ link('approval-queue') }}" class="menu-linkRow">{{ phrase('approval_queue') }}</a>
+							</xf:if>
+							<xf:if is="$xf.visitor.is_moderator && !$xf.options.reportIntoForumId">
+								<a href="{{ link('reports') }}" class="menu-linkRow" title="{{ $xf.session.reportCounts.lastBuilt ? phrase('last_report_update:')|for_attr . ' ' . date_time($xf.session.reportCounts.lastBuilt) : '' }}">{{ phrase('reports') }}</a>
+							</xf:if>
+							<!--[XF:mod_tools_menu:bottom]-->
+							</xf:contentcheck>
+						</div>
+					</div>
+				</xf:if>
+
+				<xf:if is="$xf.visitor.is_admin">
+					<a href="{{ base_url('admin.php') }}" class="p-staffBar-link" target="_blank">{{ phrase('admin') }}</a>
+				</xf:if>
+			</xf:contentcheck>
+			</div>
+		</div>
+	</div>
+</xf:if>
+
+<xf:set var="$srcset">{{ property('publicLogoUrl2x') ? base_url(property('publicLogoUrl2x')) . ' 2x' : '' }}</xf:set>
+
+<header class="p-header" id="header">
+	<div class="p-header-inner">
+		<div class="p-header-content">
+
+			<div class="p-header-logo p-header-logo--image">
+				<a href="{{ ($xf.options.logoLink && $xf.homePageUrl) ? $xf.homePageUrl : link('index') }}">
+					<span class="ctaLogoText">{$xf.options.boardShortTitle}</span>
+				</a>
+			</div>
+
+			<xf:ad position="container_header" />
+		</div>
+	</div>
+</header>
+
+<xf:set var="$navHtml">
+	<nav class="p-nav">
+		<div class="p-nav-inner">
+			<xf:button class="button--plain p-nav-menuTrigger" data-xf-click="off-canvas" data-menu=".js-headerOffCanvasMenu" tabindex="0"
+				aria-label="{{ phrase('menu')|for_attr }}">
+				<i aria-hidden="true"></i>
+			</xf:button>
+
+			<div class="p-nav-smallLogo">
+				<a href="{{ ($xf.options.logoLink && $xf.homePageUrl) ? $xf.homePageUrl : link('index') }}">
+					<span class="ctaLogoTextSmall">{$xf.options.boardShortTitle}</span>
+				</a>
+			</div>
+
+			<div class="p-nav-scroller hScroller" data-xf-init="h-scroller" data-auto-scroll=".p-navEl.is-selected">
+				<div class="hScroller-scroll">
+					<ul class="p-nav-list js-offCanvasNavSource">
+					<xf:foreach loop="$navTree" key="$navSection" value="$navEntry" i="$i" if="{{ $navSection != $xf.app.defaultNavigationId }}">
+						<li>
+							<xf:macro name="nav_entry"
+								arg-navId="{$navSection}"
+								arg-nav="{$navEntry}"
+								arg-selected="{{ $navSection == $pageSection }}"
+								arg-shortcut="{$i}" />
+						</li>
+					</xf:foreach>
+					</ul>
+				</div>
+			</div>
+
+			<div class="p-nav-opposite">
+				<div class="p-navgroup p-account {{ $xf.visitor.user_id ? 'p-navgroup--member' : 'p-navgroup--guest' }}">
+					<xf:if is="$xf.visitor.user_id">
+						<xf:if is="$xf.visitor.user_state == 'rejected' OR $xf.visitor.user_state == 'disabled'">
+							<a href="{{ link('account') }}"
+								class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--user">
+								<xf:avatar user="$xf.visitor" size="xxs" href="" title="" />
+								<span class="p-navgroup-linkText">{$xf.visitor.username}</span>
+							</a>
+
+							<a href="{{ link('logout', null, {'t': csrf_token()}) }}" class="p-navgroup-link">
+								<span class="p-navgroup-linkText">{{ phrase('log_out') }}</span>
+							</a>
+						<xf:else />
+							<a href="{{ link('account') }}"
+								class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--user"
+								data-xf-click="menu"
+								data-xf-key="{{ phrase('shortcut.visitor_menu')|for_attr }}"
+								data-menu-pos-ref="< .p-navgroup"
+								title="{$xf.visitor.username}"
+								aria-expanded="false"
+								aria-haspopup="true">
+								<xf:avatar user="$xf.visitor" size="xxs" href="" title="" />
+								<span class="p-navgroup-linkText">{$xf.visitor.username}</span>
+							</a>
+							<div class="menu menu--structural menu--wide menu--account" data-menu="menu" aria-hidden="true"
+								data-href="{{ link('account/visitor-menu') }}"
+								data-load-target=".js-visitorMenuBody">
+								<div class="menu-content js-visitorMenuBody">
+									<div class="menu-row">
+										{{ phrase('loading...') }}
+									</div>
+								</div>
+							</div>
+
+							<a href="{{ link('conversations') }}"
+								class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--conversations js-badge--conversations badgeContainer{{ $xf.visitor.conversations_unread ? ' badgeContainer--highlighted' : '' }}"
+								data-badge="{$xf.visitor.conversations_unread|number}"
+								data-xf-click="menu"
+								data-xf-key="{{ phrase('shortcut.conversations_menu')|for_attr }}"
+								data-menu-pos-ref="< .p-navgroup"
+								title="{{ phrase('conversations')|for_attr }}"
+								aria-label="{{ phrase('conversations')|for_attr }}"
+								aria-expanded="false"
+								aria-haspopup="true">
+								<i aria-hidden="true"></i>
+								<span class="p-navgroup-linkText">{{ phrase('nav_inbox') }}</span>
+							</a>
+							<div class="menu menu--structural menu--medium" data-menu="menu" aria-hidden="true"
+								data-href="{{ link('conversations/popup') }}"
+								data-nocache="true"
+								data-load-target=".js-convMenuBody">
+								<div class="menu-content">
+									<h3 class="menu-header">{{ phrase('conversations') }}</h3>
+									<div class="js-convMenuBody">
+										<div class="menu-row">{{ phrase('loading...') }}</div>
+									</div>
+									<xf:widget key="forum_overview_forum_statistics" />
+
+									<div class="menu-footer menu-footer--split">
+										<div class="menu-footer-main">
+											<ul class="listInline listInline--bullet">
+												<li><a href="{{ link('conversations') }}">{{ phrase('show_all') }}</a></li>
+												<xf:if is="$xf.visitor.canStartConversation()">
+													<li><a href="{{ link('conversations/add') }}">{{ phrase('start_new_conversation') }}</a></li>
+												</xf:if>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<a href="{{ link('account/alerts') }}"
+								class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--alerts js-badge--alerts badgeContainer{{ $xf.visitor.alerts_unviewed ? ' badgeContainer--highlighted' : '' }}"
+								data-badge="{$xf.visitor.alerts_unviewed|number}"
+								data-xf-click="menu"
+								data-xf-key="{{ phrase('shortcut.alerts_menu')|for_attr }}"
+								data-menu-pos-ref="< .p-navgroup"
+								title="{{ phrase('alerts')|for_attr }}"
+								aria-label="{{ phrase('alerts')|for_attr }}"
+								aria-expanded="false"
+								aria-haspopup="true">
+								<i aria-hidden="true"></i>
+								<span class="p-navgroup-linkText">{{ phrase('nav_alerts') }}</span>
+							</a>
+							<div class="menu menu--structural menu--medium" data-menu="menu" aria-hidden="true"
+								data-href="{{ link('account/alerts-popup') }}"
+								data-nocache="true"
+								data-load-target=".js-alertsMenuBody">
+								<div class="menu-content">
+									<h3 class="menu-header">{{ phrase('alerts') }}</h3>
+									<div class="js-alertsMenuBody">
+										<div class="menu-row">{{ phrase('loading...') }}</div>
+									</div>
+									<div class="menu-footer menu-footer--split">
+										<div class="menu-footer-main">
+											<ul class="listInline listInline--bullet">
+												<li><a href="{{ link('account/alerts') }}">{{ phrase('show_all') }}</a></li>
+												<li><a href="{{ link('account/alerts/mark-read') }}" class="js-alertsMarkRead">{{ phrase('mark_read') }}</a></li>
+												<li><a href="{{ link('account/preferences') }}">{{ phrase('preferences') }}</a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</xf:if>
+					<xf:else />
+						<a href="{{ link('login') }}" class="p-navgroup-link p-navgroup-link--textual p-navgroup-link--logIn"
+							data-xf-click="overlay" data-follow-redirects="on">
+							<span class="p-navgroup-linkText">{{ phrase('log_in') }}</span>
+						</a>
+						<xf:if is="$xf.options.registrationSetup.enabled">
+							<a href="{{ link('register') }}" class="p-navgroup-link p-navgroup-link--textual p-navgroup-link--register"
+								data-xf-click="overlay" data-follow-redirects="on">
+								<span class="p-navgroup-linkText">{{ phrase('register') }}</span>
+							</a>
+						</xf:if>
+					</xf:if>
+				</div>
+
+				<div class="p-navgroup p-discovery{{ !$xf.visitor.canSearch() ? ' p-discovery--noSearch' : '' }}">
+					<a href="{{ link('whats-new') }}"
+						class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--whatsnew"
+						aria-label="{{ phrase('whats_new')|for_attr }}"
+						title="{{ phrase('whats_new')|for_attr }}">
+						<i aria-hidden="true"></i>
+						<span class="p-navgroup-linkText">{{ phrase('whats_new') }}</span>
+					</a>
+
+					<xf:if is="$xf.visitor.canSearch()">
+						<a href="{{ link('search') }}"
+							class="p-navgroup-link p-navgroup-link--iconic p-navgroup-link--search"
+							data-xf-click="menu"
+							data-xf-key="{{ phrase('shortcut.search_menu')|for_attr }}"
+							aria-label="{{ phrase('search')|for_attr }}"
+							aria-expanded="false"
+							aria-haspopup="true"
+							title="{{ phrase('search')|for_attr }}">
+							<i aria-hidden="true"></i>
+							<span class="p-navgroup-linkText">{{ phrase('search') }}</span>
+						</a>
+						<div class="menu menu--structural menu--wide" data-menu="menu" aria-hidden="true">
+							<form action="{{ link('search/search') }}" method="post"
+								class="menu-content"
+								data-xf-init="quick-search">
+
+								<h3 class="menu-header">{{ phrase('search') }}</h3>
+								<!--[XF:search_menu:above_input]-->
+								<div class="menu-row">
+									<xf:if is="$searchConstraints">
+										<div class="inputGroup inputGroup--joined">
+											<xf:textbox name="keywords"
+												placeholder="{{ phrase('search...') }}"
+												aria-label="{{ phrase('search') }}"
+												data-menu-autofocus="true" />
+											<xf:select name="constraints"
+												class="js-quickSearch-constraint"
+												aria-label="{{ phrase('search_within') }}">
+
+												<xf:option value="">{{ phrase('everywhere') }}</xf:option>
+												<xf:foreach loop="$searchConstraints" key="$constraintName" value="$constraint">
+													<xf:option value="{$constraint|json}">{$constraintName}</xf:option>
+												</xf:foreach>
+											</xf:select>
+										</div>
+									<xf:else />
+										<xf:textbox name="keywords"
+											placeholder="{{ phrase('search...') }}"
+											aria-label="{{ phrase('search') }}"
+											data-menu-autofocus="true" />
+									</xf:if>
+								</div>
+
+								<!--[XF:search_menu:above_title_only]-->
+								<div class="menu-row">
+									<xf:checkbox standalone="true">
+										<xf:option name="c[title_only]">
+											<xf:label>
+												{{ phrase('search_titles_only') }}
+
+												<xf:if is="$xf.options.enableTagging">
+													<span tabindex="0" role="button"
+														data-xf-init="tooltip" data-trigger="hover focus click" title="{{ phrase('tags_will_also_be_searched')|for_attr }}">
+
+														<xf:fa icon="far fa-question-circle" class="u-muted u-smaller" />
+													</span>
+												</xf:if>
+											</xf:label>
+										</xf:option>
+									</xf:checkbox>
+								</div>
+								<!--[XF:search_menu:above_member]-->
+								<div class="menu-row">
+									<div class="inputGroup">
+										<span class="inputGroup-text" id="ctrl_search_menu_by_member">{{ phrase('by:') }}</span>
+										<input type="text" class="input" name="c[users]" data-xf-init="auto-complete" placeholder="{{ phrase('member') }}" aria-labelledby="ctrl_search_menu_by_member" />
+									</div>
+								</div>
+								<div class="menu-footer">
+									<span class="menu-footer-controls">
+										<xf:button type="submit" class="button--primary" icon="search" />
+										<xf:button href="{{ link('search') }}">{{ phrase('advanced_search...') }}</xf:button>
+									</span>
+								</div>
+
+								<xf:csrf />
+							</form>
+						</div>
+					</xf:if>
+				</div>
+			</div>
+		</div>
+	</nav>
+</xf:set>
+<xf:set var="$subNavHtml">
+	<xf:if is="$selectedNavChildren is not empty">
+		<div class="p-sectionLinks">
+			<div class="p-sectionLinks-inner hScroller" data-xf-init="h-scroller">
+				<div class="hScroller-scroll">
+					<ul class="p-sectionLinks-list">
+					<xf:foreach loop="$selectedNavChildren" key="$navId" value="$navEntry" i="$i">
+						<li>
+							<xf:macro name="nav_entry" arg-navId="{$navId}" arg-nav="{$navEntry}" arg-shortcut="alt+{$i}" />
+						</li>
+					</xf:foreach>
+					</ul>
+				</div>
+			</div>
+		</div>
+	<xf:elseif is="{$selectedNavEntry}" />
+		<div class="p-sectionLinks p-sectionLinks--empty"></div>
+	</xf:if>
+</xf:set>
+
+<xf:if is="property('publicNavSticky') == 'primary'">
+	<div class="p-navSticky p-navSticky--primary" data-xf-init="sticky-header">
+		{$navHtml|raw}
+	</div>
+	{$subNavHtml|raw}
+<xf:elseif is="property('publicNavSticky') == 'all'" />
+	<div class="p-navSticky p-navSticky--all" data-xf-init="sticky-header">
+		{$navHtml|raw}
+		{$subNavHtml|raw}
+	</div>
+<xf:else />
+	{$navHtml|raw}
+	{$subNavHtml|raw}
+</xf:if>
+
+<div class="offCanvasMenu offCanvasMenu--nav js-headerOffCanvasMenu" data-menu="menu" aria-hidden="true" data-ocm-builder="navigation">
+	<div class="offCanvasMenu-backdrop" data-menu-close="true"></div>
+	<div class="offCanvasMenu-content">
+		<div class="offCanvasMenu-header">
+			{{ phrase('menu') }}
+			<a class="offCanvasMenu-closer" data-menu-close="true" role="button" tabindex="0" aria-label="{{ phrase('close')|for_attr }}"></a>
+		</div>
+		<xf:if is="$xf.visitor.user_id">
+			<div class="p-offCanvasAccountLink">
+				<div class="offCanvasMenu-linkHolder">
+					<a href="{{ link('account') }}" class="offCanvasMenu-link">
+						<xf:avatar user="$xf.visitor" size="xxs" href="" />
+						{$xf.visitor.username}
+					</a>
+				</div>
+				<hr class="offCanvasMenu-separator" />
+			</div>
+		<xf:else />
+			<div class="p-offCanvasRegisterLink">
+				<div class="offCanvasMenu-linkHolder">
+					<a href="{{ link('login') }}" class="offCanvasMenu-link" data-xf-click="overlay" data-menu-close="true">
+						{{ phrase('log_in') }}
+					</a>
+				</div>
+				<hr class="offCanvasMenu-separator" />
+				<xf:if is="$xf.options.registrationSetup.enabled">
+					<div class="offCanvasMenu-linkHolder">
+						<a href="{{ link('register') }}" class="offCanvasMenu-link" data-xf-click="overlay" data-menu-close="true">
+							{{ phrase('register') }}
+						</a>
+					</div>
+					<hr class="offCanvasMenu-separator" />
+				</xf:if>
+			</div>
+		</xf:if>
+		<div class="js-offCanvasNavTarget"></div>
+		<div class="offCanvasMenu-installBanner js-installPromptContainer" style="display: none;" data-xf-init="install-prompt">
+			<div class="offCanvasMenu-installBanner-header">{{ phrase('install_app') }}</div>
+			<xf:button class="js-installPromptButton">{{ phrase('install') }}</xf:button>
+		</div>
+	</div>
+</div>
+
+<div class="p-body">
+	<div class="p-body-inner">
+		<!--XF:EXTRA_OUTPUT-->
+
+		<xf:if is="$notices.block">
+			<xf:macro template="notice_macros" name="notice_list" arg-type="block" arg-notices="{$notices.block}" />
+		</xf:if>
+
+		<xf:if is="$notices.scrolling">
+			<xf:macro template="notice_macros" name="notice_list" arg-type="scrolling" arg-notices="{$notices.scrolling}" />
+		</xf:if>
+
+		<xf:ad position="container_breadcrumb_top_above" />
+		<xf:macro name="breadcrumbs"
+			arg-breadcrumbs="{$breadcrumbs}"
+			arg-navTree="{$navTree}"
+			arg-selectedNavEntry="{$selectedNavEntry}" />
+		<xf:ad position="container_breadcrumb_top_below" />
+
+		<xf:macro template="browser_warning_macros" name="javascript" />
+		<xf:macro template="browser_warning_macros" name="browser" />
+
+		<xf:if is="$headerHtml is not empty">
+			<div class="p-body-header">
+				{$headerHtml|raw}
+			</div>
+		<xf:elseif contentcheck="true" />
+			<div class="p-body-header">
+			<xf:contentcheck>
+				<xf:if contentcheck="true">
+					<div class="p-title {{ $noH1 ? 'p-title--noH1' : '' }}">
+					<xf:contentcheck>
+						<xf:if is="!$noH1">
+							<h1 class="p-title-value">{$h1}</h1>
+						</xf:if>
+						<xf:if contentcheck="true">
+							<div class="p-title-pageAction"><xf:contentcheck><xf:pageaction /></xf:contentcheck></div>
+						</xf:if>
+					</xf:contentcheck>
+					</div>
+				</xf:if>
+
+				<xf:if is="$description is not empty">
+					<div class="p-description">{$description}</div>
+				</xf:if>
+			</xf:contentcheck>
+			</div>
+		</xf:if>
+
+		<div class="p-body-main {{ $sidebar ? 'p-body-main--withSidebar' : '' }} {{ $sideNav ? 'p-body-main--withSideNav' : '' }}">
+			<xf:if is="$sideNav">
+				<div class="p-body-sideNavCol"></div>
+			</xf:if>
+			<div class="p-body-contentCol"></div>
+			<xf:if is="$sidebar">
+				<div class="p-body-sidebarCol"></div>
+			</xf:if>
+
+			<xf:if is="$sideNav">
+				<div class="p-body-sideNav">
+					<div class="p-body-sideNavTrigger">
+						<xf:button class="button--link" data-xf-click="off-canvas" data-menu="#js-SideNavOcm">
+							{{ $sideNavTitle ?: phrase('navigation') }}
+						</xf:button>
+					</div>
+					<div class="p-body-sideNavInner" data-ocm-class="offCanvasMenu offCanvasMenu--blocks" id="js-SideNavOcm" data-ocm-builder="sideNav">
+						<div data-ocm-class="offCanvasMenu-backdrop" data-menu-close="true"></div>
+						<div data-ocm-class="offCanvasMenu-content">
+							<div class="p-body-sideNavContent">
+								<xf:ad position="container_sidenav_above" />
+								<xf:foreach loop="$sideNav" value="$sideNavHtml">
+									{$sideNavHtml}
+								</xf:foreach>
+								<xf:ad position="container_sidenav_below" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</xf:if>
+
+			<div class="p-body-content">
+				<xf:ad position="container_content_above" />
+				<div class="p-body-pageContent">{$content|raw}</div>
+				<xf:ad position="container_content_below" />
+			</div>
+
+			<xf:if is="$sidebar">
+				<div class="p-body-sidebar">
+					<xf:ad position="container_sidebar_above" />
+					<xf:foreach loop="$sidebar" value="$sidebarHtml">
+						{$sidebarHtml}
+					</xf:foreach>
+					<xf:ad position="container_sidebar_below" />
+				</div>
+			</xf:if>
+		</div>
+
+		<xf:ad position="container_breadcrumb_bottom_above" />
+		<xf:macro name="breadcrumbs"
+			arg-breadcrumbs="{$breadcrumbs}"
+			arg-navTree="{$navTree}"
+			arg-selectedNavEntry="{$selectedNavEntry}"
+			arg-variant="bottom" />
+		<xf:ad position="container_breadcrumb_bottom_below" />
+		<div class="manageralert">
+<div class="alerticon">
+    <i class="fa fa-flag"></i>
+</div>   
+<div class="alert-content">
+    <h3><i class="fa fa-thumbs-up"></i><label>كلمة تقنى</label></h3>
+    <p>
+    جميع المواضيع والمشاركات المكتوبة تعبّر عن وجهة نظر صاحبها ,, ولا تعبّر بأي شكل من الاشكال عن وجهة نظر إدارة تقنى .. بالرغم من محاولتنا المستمرة لمنع جميع المخالفات إلا أنه ليس بوسعنا إستعراض جميع المشاركات المدرجة ولا يتحمل تقنى أي مسؤولية قانونية عن محتوى تلك المشاركات .
+الموقع غير مسؤول عن أي اتفاق تجاري أو تعاوني بين الأعضاء فعلى كل شخص تحمل مسئولية نفسه إتجاه مايقوم به من بيع وشراء وإتفاق وأعطاء معلومات موقعه. .
+</p>
+</div>   
+</div>
+	</div>
+</div>
+
+<footer class="p-footer" id="footer">
+	<div class="p-footer-inner">
+
+		<div class="p-footer-row">
+			<xf:if contentcheck="true">
+				<div class="p-footer-row-main">
+					<ul class="p-footer-linkList">
+					<xf:contentcheck>
+						<xf:if is="$xf.visitor.canChangeStyle()">
+							<li><a href="{{ link('misc/style') }}" data-xf-click="overlay"
+								data-xf-init="tooltip" title="{{ phrase('style_chooser')|for_attr }}" rel="nofollow">
+								<xf:fa icon="fa-paint-brush" /> {$xf.style.title}
+							</a></li>
+						</xf:if>
+						<xf:if is="$xf.visitor.canChangeLanguage()">
+							<li><a href="{{ link('misc/language') }}" data-xf-click="overlay"
+								data-xf-init="tooltip" title="{{ phrase('language_chooser')|for_attr }}" rel="nofollow">
+								<xf:fa icon="fa-globe" /> {$xf.language.title}</a></li>
+						</xf:if>
+					</xf:contentcheck>
+					</ul>
+				</div>
+			</xf:if>
+			<div class="p-footer-row-opposite">
+				<ul class="p-footer-linkList">
+					<xf:if is="$xf.visitor.canUseContactForm()">
+						<xf:if is="$xf.contactUrl">
+							<li><a href="{$xf.contactUrl}" data-xf-click="{{ ($xf.options.contactUrl.overlay OR $xf.options.contactUrl.type == 'default') ? 'overlay' : '' }}">{{ phrase('contact_us') }}</a></li>
+						</xf:if>
+					</xf:if>
+
+					<xf:if is="$xf.tosUrl">
+						<li><a href="{$xf.tosUrl}">{{ phrase('terms_and_rules') }}</a></li>
+					</xf:if>
+
+					<xf:if is="$xf.privacyPolicyUrl">
+						<li><a href="{$xf.privacyPolicyUrl}">{{ phrase('privacy_policy') }}</a></li>
+					</xf:if>
+
+					<xf:if is="$xf.helpPageCount">
+						<li><a href="{{ link('help') }}">{{ phrase('help') }}</a></li>
+					</xf:if>
+
+					<xf:if is="$xf.homePageUrl">
+						<li><a href="{$xf.homePageUrl}">{{ phrase('home') }}</a></li>
+					</xf:if>
+
+					<li><a href="{{ link('forums/index.rss', '-') }}" target="_blank" class="p-footer-rssLink" title="{{ phrase('rss')|for_attr }}"><span aria-hidden="true"><xf:fa icon="fa-rss" /><span class="u-srOnly">{{ phrase('rss') }}</span></span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<xf:if contentcheck="true">
+			<div class="p-footer-copyright">
+			<xf:contentcheck>
+				<xf:copyright />
+				{{ phrase('extra_copyright') }}
+			</xf:contentcheck>
+			</div>
+		</xf:if>
+
+		<xf:if contentcheck="true">
+			<div class="p-footer-debug">
+			<xf:contentcheck>
+				<xf:macro template="debug_macros" name="debug"
+					arg-controller="{$controller}"
+					arg-action="{$actionMethod}"
+					arg-template="{$template}" />
+			</xf:contentcheck>
+			</div>
+		</xf:if>
+	</div>
+</footer>
+
+</div> <!-- closing p-pageWrapper -->
+
+<div class="u-bottomFixer js-bottomFixTarget">
+	<xf:if is="$notices.floating">
+		<xf:macro template="notice_macros" name="notice_list" arg-type="floating" arg-notices="{$notices.floating}" />
+	</xf:if>
+	<xf:if is="$notices.bottom_fixer">
+		<xf:macro template="notice_macros" name="notice_list" arg-type="bottom_fixer" arg-notices="{$notices.bottom_fixer}" />
+	</xf:if>
+</div>
+
+<xf:if is="property('scrollJumpButtons')">
+	<div class="u-scrollButtons js-scrollButtons" data-trigger-type="{{ property('scrollJumpButtons') }}">
+		<xf:button href="#top" class="button--scroll" data-xf-click="scroll-to"><xf:fa icon="fa-arrow-up" /><span class="u-srOnly">{{ phrase('top') }}</span></xf:button>
+		<xf:if is="property('scrollJumpButtons') != 'up'">
+			<xf:button href="#footer" class="button--scroll" data-xf-click="scroll-to"><xf:fa icon="fa-arrow-down" /><span class="u-srOnly">{{ phrase('bottom') }}</span></xf:button>
+		</xf:if>
+	</div>
+</xf:if>
+
+<xf:macro template="helper_js_global" name="body" arg-app="public" arg-jsState="{$jsState}" />
+
+<xf:if is="count($xf.reactionsActive) > 1 AND $xf.visitor.user_id">
+	<script type="text/template" id="xfReactTooltipTemplate">
+		<div class="tooltip-content-inner">
+			<div class="reactTooltip">
+				<xf:foreach loop="$xf.reactionsActive" key="$reactionId" value="$reaction">
+					<xf:reaction id="{$reactionId}" tooltip="true" />
+				</xf:foreach>
+			</div>
+		</div>
+	</script>
+</xf:if>
+
+{$ldJsonHtml|raw}
+
+</body>
+</html>
+
+<xf:macro name="nav_entry" arg-navId="!" arg-nav="!" arg-selected="{{ false }}" arg-shortcut="">
+	<div class="p-navEl {{ $selected ? 'is-selected' : '' }}" {{ $nav.children ? 'data-has-children="true"' : '' }}>
+		<xf:if is="$nav.href">
+
+			<xf:macro name="nav_link"
+				arg-navId="{$navId}"
+				arg-nav="{$nav}"
+				arg-class="p-navEl-link {{ $nav.children ? 'p-navEl-link--splitMenu' : '' }}"
+				arg-shortcut="{{ $nav.children ? false : $shortcut }}" />
+
+			<xf:if is="$nav.children"><a data-xf-key="{$shortcut}"
+				data-xf-click="menu"
+				data-menu-pos-ref="< .p-navEl"
+				class="p-navEl-splitTrigger"
+				role="button"
+				tabindex="0"
+				aria-label="{{ phrase('toggle_expanded')|for_attr }}"
+				aria-expanded="false"
+				aria-haspopup="true"></a></xf:if>
+
+		<xf:elseif is="$nav.children" /><a data-xf-key="{$shortcut}"
+			data-xf-click="menu"
+			data-menu-pos-ref="< .p-navEl"
+			class="p-navEl-linkHolder"
+			role="button"
+			tabindex="0"
+			aria-expanded="false"
+			aria-haspopup="true">
+			<xf:macro name="nav_link"
+				arg-navId="{$navId}"
+				arg-nav="{$nav}"
+				arg-class="p-navEl-link p-navEl-link--menuTrigger" />
+		</a>
+
+		<xf:else />
+
+			<xf:macro name="nav_link"
+				arg-navId="{$navId}"
+				arg-nav="{$nav}"
+				arg-class="p-navEl-link"
+				arg-shortcut="{$shortcut}" />
+
+		</xf:if>
+		<xf:if is="$nav.children">
+			<div class="menu menu--structural" data-menu="menu" aria-hidden="true">
+				<div class="menu-content">
+					<xf:foreach loop="$nav.children" key="$childNavId" value="$child">
+						<xf:macro name="nav_menu_entry"
+							arg-navId="{$childNavId}"
+							arg-nav="{$child}" />
+					</xf:foreach>
+				</div>
+			</div>
+		</xf:if>
+	</div>
+</xf:macro>
+
+<xf:macro name="nav_link" arg-navId="!" arg-nav="!" arg-class="" arg-titleHtml="" arg-shortcut="{{ false }}">
+	<xf:set var="$tag" value="{{ $nav.href ? 'a' : 'span' }}" />
+	<{$tag} {{ $nav.href ? 'href="' . $nav.href . '"' : '' }}
+		class="{{ trim($class) }} {$nav.attributes.class}"
+		{{ attributes($nav.attributes, ['class']) }}
+		{{ $shortcut !== false ? 'data-xf-key="' . $shortcut . '"' : '' }}
+		data-nav-id="{$navId}"><xf:if is="$nav.icon"><xf:fa icon="{$nav.icon}" /> </xf:if>{{ $titleHtml ? $titleHtml|raw : $nav.title }}<xf:if is="$nav.counter"> <span class="badge badge--highlighted">{$nav.counter|number}</span></xf:if></{$tag}>
+</xf:macro>
+
+<xf:macro name="nav_menu_entry" arg-navId="!" arg-nav="!" arg-depth="0">
+	<xf:macro name="nav_link"
+		arg-navId="{$navId}"
+		arg-nav="{$nav}"
+		arg-class="menu-linkRow u-indentDepth{$depth} js-offCanvasCopy" />
+	<xf:if is="$nav.children">
+		<xf:foreach loop="$nav.children" key="$childNavId" value="$child">
+			<xf:macro name="nav_menu_entry"
+				arg-navId="{$childNavId}"
+				arg-nav="{$child}"
+				arg-depth="{{ $depth + 1 }}" />
+		</xf:foreach>
+		<xf:if is="$depth == 0">
+			<hr class="menu-separator" />
+		</xf:if>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="breadcrumbs" arg-breadcrumbs="!" arg-navTree="!" arg-selectedNavEntry="{{ null }}" arg-variant="">
+	<xf:if contentcheck="true">
+		<ul class="p-breadcrumbs {{ $variant ? 'p-breadcrumbs--' . $variant : '' }}"
+			itemscope itemtype="https://schema.org/BreadcrumbList">
+		<xf:contentcheck>
+			<xf:set var="$position" value="{{ 0 }}" />
+
+			<xf:set var="$rootBreadcrumb" value="{$navTree.{$xf.options.rootBreadcrumb}}" />
+			<xf:set var="$rootBreadcrumbHref" value="{{ $rootBreadcrumb.href|substr(-1) == '/'
+					? $rootBreadcrumb.href
+					: $rootBreadcrumb.href . '/'
+				}}" />
+
+			<xf:if is="$rootBreadcrumb AND $rootBreadcrumbHref != $xf.uri AND $rootBreadcrumbHref != $xf.fullUri">
+				<xf:set var="$position" value="{{ $position + 1 }}" />
+				<xf:macro name="crumb"
+					arg-position="{$position}"
+					arg-href="{$rootBreadcrumb.href}"
+					arg-value="{$rootBreadcrumb.title}" />
+			</xf:if>
+
+			<xf:if is="$selectedNavEntry AND $selectedNavEntry.href AND $selectedNavEntry.href != $xf.uri AND $selectedNavEntry.href != $xf.fullUri AND $selectedNavEntry.href != $rootBreadcrumbHref">
+				<xf:set var="$position" value="{{ $position + 1 }}" />
+				<xf:macro name="crumb"
+					arg-position="{$position}"
+					arg-href="{$selectedNavEntry.href}"
+					arg-value="{$selectedNavEntry.title}" />
+			</xf:if>
+			<xf:foreach loop="$breadcrumbs" value="$breadcrumb" if="$breadcrumb.href != $xf.uri AND $breadcrumb.href != $xf.fullUri">
+				<xf:set var="$position" value="{{ $position + 1 }}" />
+				<xf:macro name="crumb"
+					arg-position="{$position}"
+					arg-href="{$breadcrumb.href}"
+					arg-value="{$breadcrumb.value}" />
+			</xf:foreach>
+
+		</xf:contentcheck>
+		</ul>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="crumb" arg-href="!" arg-value="!" arg-position="{{ 0 }}">
+	<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+		<a href="{$href}" itemprop="item">
+			<span itemprop="name">{$value}</span>
+		</a>
+		<xf:if is="$position"><meta itemprop="position" content="{$position}" /></xf:if>
+	</li>
+</xf:macro>]]></template>
+    <template title="app_header.less" type="public" addon_id="XF" version_id="2020771" version_string="2.2.7 Patch 1"><![CDATA[// MAIN HEADER ROW
+
+.p-header
+{
+	.xf-publicHeader();
+
+	a
+	{
+		color: inherit;
+	}
+}
+
+.p-header-inner
+{
+	.m-pageWidth();
+	.m-pageInset();
+}
+
+.p-header-content
+{
+	padding: @xf-paddingMedium 0;
+
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	max-width: 100%;
+}
+
+.p-header-logo
+{
+	vertical-align: middle;
+	margin-right: auto;
+
+	a
+	{
+		color: inherit;
+		text-decoration: none;
+	}
+
+	&.p-header-logo--text
+	{
+		font-size: @xf-fontSizeLargest;
+	}
+
+	&.p-header-logo--image
+	{
+		img
+		{
+			vertical-align: bottom;
+			max-width: 100%;
+			
+			// Note: this is XF template syntax, not LESS
+			{{ !property('publicLogoHeight') ? 'max-height: 200px;' : ''}}
+
+			&[src$="/xenforo-logo.svg"]
+			{
+				height: 36px;
+			}
+		}
+	}
+}
+
+@media (max-width: @xf-publicNavCollapseWidth)
+{
+	.has-js .p-header
+	{
+		display: none;
+	}
+}
+
+@media (max-width: @xf-responsiveNarrow)
+{
+	.p-header-logo
+	{
+		max-width: 100px;
+
+		&.p-header-logo--text
+		{
+			font-size: @xf-fontSizeLarge;
+			font-weight: @xf-fontWeightNormal;
+			.m-overflowEllipsis();
+		}
+	}
+}]]></template>
+    <template title="extra.less" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[/* Source thread */
+.PrevNextThread {
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    color: #0027B0;
+    font-weight: lighter;
+}
+.PrevNextThread a {
+    background-color: #DBECC0;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 1px solid #B5CD8E;
+    box-shadow: 0px 0px 3px #E2E2E2;
+    border-radius: 5px;
+    color: #4C6A13;
+    font-weight: lighter;
+} 
+    @media (max-width: @xf-responsiveNarrow)
+{
+        .PrevNextThread a 
+     {
+    background-color: transparent;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 0;
+    box-shadow: 0px 0px 3px transparent;
+    border-radius: 0;
+    color: #4C6A13;
+    font-weight: lighter;
+        }
+    }
+//***EnD Source thread****// 
+
+
+
+
+
+.block {
+    h3:before {
+        display: inline-block;
+        .m-faBase();
+        padding-right: 3px;
+    }
+
+    &[data-widget-section="staffMembers"] {
+        h3 {
+            .m-faBefore("\f0e3");
+        }
+    }
+
+    &[data-widget-section="onlineNow"] {
+        h3 {
+            .m-faBefore("\f007")
+        }
+    }
+
+    &[data-widget-definition="new_profile_posts"] {
+        h3 {
+            .m-faBefore("\f086")
+        }
+    }
+
+    &[data-widget-definition="new_posts"] {
+        h3 {
+            .m-faBefore("\f080")
+        }
+    }
+
+    &[data-widget-definition="share_page"] {
+        h3 {
+            .m-faBefore("\f14d")
+        }
+    }
+
+    &[data-widget-definition="find_member"] {
+        h3 {
+            .m-faBefore("\f002")
+        }
+    }
+
+    &[data-widget-definition="newest_members"] {
+        h3 {
+            .m-faBefore("\f234")
+        }
+    }
+
+    &[data-widget-definition="birthdays"] {
+        h3 {
+            .m-faBefore("\f1fd")
+        }
+    }
+
+    &[data-widget-definition="xfrm_new_resources"] {
+        h3 {
+            .m-faBefore("\f187")
+        }
+    }
+
+    &[data-widget-definition="xfrm_top_resources"] {
+        h3 {
+            .m-faBefore("\f091")
+        }
+    }
+
+    &[data-widget-definition="xfrm_latest_reviews"] {
+        h3 {
+            .m-faBefore("\f005")
+        }
+    }
+
+    &[data-widget-key="xfrm_overview_top_authors"] {
+        h3.block-minorHeader {
+            .m-faBefore("\f201")
+        }
+    }
+}
+
+
+
+.node--unread .node-icon i:after, .node--unread .no-icon i:after {
+    font-family: Droid Arabic Kufi;
+    font-size: 13px;
+    font-style: initial;
+    font-weight: bold;
+    line-height: 18px;
+    float: right;
+    color: #fff;
+    background-color: #8BC34A;
+    padding: 0px 7px;
+    left: 3px;
+    margin-top: -6px;
+    position: relative;
+    border-radius: 2px;
+    text-transform: uppercase;
+    content: "جديد";
+}
+
+
+
+/* كود أيقونات بصفحة قائمة أبرز الأعضاء */
+[data-template="member_notable"] .p-body-sideNavContent a.blockLink,
+&[data-template="member_notable"] h3.block-textHeader a {
+    &:before {
+        .m-faBase();
+        padding-right: 5px;
+    }
+    &[href*="members/"]:before {
+        .m-faContent(@fa-var-ellipsis-h-alt);
+    }
+    &[href*="key=most_messages"]:before {
+        .m-faContent(@fa-var-comments);
+    }
+    &[href*="key=highest_reaction_score"]:before {
+        .m-faContent(@fa-var-thumbs-up);
+    }
+    &[href*="key=most_points"]:before {
+        .m-faContent(@fa-var-dot-circle);
+    }
+    &[href*="key=xfrm_most_resources"]:before {
+        .m-faContent(@fa-var-cog);
+    }
+    &[href*="key=xfmg_most_media_items"]:before {
+        .m-faContent(@fa-var-images);
+    }
+    &[href*="key=xfmg_most_albums"]:before {
+        .m-faContent(@fa-var-image);
+    }
+    &[href*="key=todays_birthdays"]:before {
+        .m-faContent(@fa-var-gift);
+    }
+    &[href*="key=staff_members"]:before {
+        .m-faContent(@fa-var-user-tie);
+    }
+}
+
+
+
+
+.menu-content.js-visitorMenuBody .menu-linkRow {
+    padding: 6px 5px 6px 12px;
+}
+.menu-content.js-visitorMenuBody a.menu-linkRow {
+    &:before {
+        .m-faBase();
+    }
+    &[href*="whats-new/news-feed"]:before {
+        .m-faContent(@fa-var-rss);
+    }
+    &[href*="search/member"]:before {
+        .m-faContent(@fa-var-comments);
+    }
+    &[href*="account/reactions"]:before {
+        .m-faContent(@fa-var-thumbs-up);
+    }
+    &[href*="account/alerts"]:before {
+        .m-faContent(@fa-var-bell);
+    }
+    &[href*="account/account-details"]:before {
+        .m-faContent(@fa-var-user-cog);
+    }
+    &[href*="account/security"]:before {
+        .m-faContent(@fa-var-shield-alt);
+    }
+    &[href*="account/privacy"]:before {
+        .m-faContent(@fa-var-lock);
+    }
+    &[href*="account/preferences"]:before {
+        .m-faContent(@fa-var-cogs);
+    }
+    &[href*="account/signature"]:before {
+        .m-faContent(@fa-var-signature);
+    }
+    &[href*="account/upgrades"]:before {
+        .m-faBase('Brands');
+        .m-faContent(@fa-var-paypal);
+    }
+    &[href*="account/connected-accounts"]:before {
+        .m-faContent(@fa-var-users-class);
+    }
+    &[href*="account/following"]:before {
+        .m-faContent(@fa-var-user-plus);
+    }
+    &[href*="account/ignored"]:before {
+        .m-faContent(@fa-var-user-minus);
+    }
+    &[href*="logout"]:before {
+        .m-faContent(@fa-var-sign-out);
+    }
+}
+
+
+
+[data-template^="account_"], [data-template^="mrs_account_"] {
+    .p-body-sideNav {
+        [class^="block"]:before {
+            display: inline-block;
+            .m-faBase();
+            margin-right: 5px;
+        }
+
+        h3[class^="block"] {
+            .m-faBefore("\f0da");
+        }
+
+        [class^="block"] {
+
+            &[href^="/members/"] {
+                .m-faBefore("\f007");
+            }
+
+
+            &[href$="/alerts"] {
+                .m-faBefore("\f0f3");
+            }
+
+            &[href$="/reactions"] {
+                .m-faBefore("\f164");
+            }
+
+            &[href$="/bookmarks"] {
+                .m-faBefore("\f02e");
+            }
+          
+            &[href$="/reputations-given"] {
+                .m-faBefore("\f5c0");
+            }
+
+            &[href$="/account-details"] {
+                .m-faBefore("\f007");
+            }
+
+            &[href$="/security"] {
+                .m-faBefore("\f084");
+            }
+
+            &[href$="/privacy"] {
+                .m-faBefore("\f023");
+            }
+
+            &[href$="/preferences"] {
+                .m-faBefore("\f085");
+            }
+
+            &[href$="/signature"] {
+                .m-faBefore("\f040");
+            }
+
+            &[href$="/account/upgrades"] {
+                .m-faBefore("\f07a");
+            }
+          
+            &[href$="/connected-accounts/"] {
+                .m-faBefore("\f0c0");
+            }
+
+            &[href$="/following"] {
+                .m-faBefore("\f234");
+            }
+
+            &[href$="/ignored"] {
+                .m-faBefore("\f235");
+            }
+
+            &[href^="/logout/"] {
+                .m-faBefore("\f08b");
+            }
+        }
+    }
+}
+
+
+.p-footer-linkList  a[href*="/misc/contact"]:before{ .m-faBase(); padding-right: 5px; content: "\f199" }
+.p-footer-linkList  a[href*="help/terms"]:before{.m-faBase(); padding-right: 5px;content: "\f071" !important;}
+.p-footer-linkList  a[href*="/help/"]:before{ .m-faBase(); padding-right: 5px; content: "\f059" }
+.p-footer-linkList  a[href*="/help/privacy-policy/"]:before{  .m-faBase(); padding-right: 5px; content: "\f21b" !important; }
+
+
+
+
+
+/*adding fa icon to prefix*/
+.fa:before{
+    font-family: 'Font Awesome 5 Pro';
+	margin-right:3px
+}
+
+
+
+
+
+
+.ctaLogoText,
+.ctaLogoTextSmall
+{
+    font-size: 28px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.ctaLogoTextSmall
+{
+    font-size: 14px;
+}
+
+.p-nav-smallLogo
+{
+    max-width: 140px;
+}
+
+.p-nav-smallLogo a
+{
+    text-decoration: none;
+}
+
+.p-nav-smallLogo img
+{
+    display: inline;
+}
+
+.p-header-content
+{
+    padding: 0 0;
+}
+
+
+
+
+/* Icons for Login and Register buttons */
+.p-navgroup-link.p-navgroup-link--textual.p-navgroup-link--logIn:before {
+    .m-faBase();
+    .m-faContent(@fa-var-sign-in, 1em);
+    color: #E6BB5C;
+}
+.p-navgroup-link.p-navgroup-link--textual.p-navgroup-link--register:before {
+    .m-faBase();
+    .m-faContent(@fa-var-key, 1em);
+    color: #E6BB5C;
+}
+/**********/
+
+
+
+
+.grid-main {
+    display: flex;
+}
+.grid {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 250px;
+    margin-left: 2%;
+}
+.grid:first-of-type {
+    margin-left: 0;
+}
+.grid .block, .grid .block-container {
+    height: 100%;
+}
+@media (max-width: @xf-responsiveMedium)
+{
+    .grid-main {
+        display: inherit;
+    }
+    .grid {
+        margin-left: inherit;
+    }
+}
+
+
+
+
+
+
+/*aligns the text of the sidebars blocks*/
+.block-minorHeader {
+text-align:center;
+}
+
+
+
+
+/* xFDestek.com - NavtabMenü Logo */
+.p-nav-smallLogo img {max-height: 33px; max-width: 105px;}
+.has-js .p-header {display: none;}
+.has-js .p-sectionLinks {display: none;}
+.has-js .p-sectionLinks {display: none;}
+.p-header-logo {max-width: 100px;}
+.has-js .p-nav-inner {min-height: 45px;}
+.p-nav-smallLogo {display: block;}
+.p-nav-list .p-navEl.is-selected .p-navEl-splitTrigger {display: inline;}
+.p-nav-list .p-navEl-link.p-navEl-link--splitMenu { padding-right: 3.75px !important; }
+.p-nav-list .p-navEl.is-selected { color: #FEFEFE; background: 0;}
+/* xFDestek.com - NavtabMenü Logo */
+
+
+
+.actionBar-action:before {
+    margin-right: 5px;
+}
+.actionBar-action--edit:before {.m-faContent("\f040");}
+.actionBar-action--report:before {.m-faContent("\f071");}
+.actionBar-action--ip:before {.m-faContent("\f002");}
+.actionBar-action--delete:before {.m-faContent("\f00d");}
+.actionBar-action--spam:before {.m-faContent("\f024");}
+.actionBar-action--warn:before {.m-faContent("\f12a");}
+.actionBar-action--history:before {.m-faContent("\f1da");}
+
+
+.actionBar-action {
+    .actionBar-set--external & {
+        padding: 3px 5px;
+        color: #176093;
+        border-radius: 2px;
+        border: 1px solid white;
+        box-shadow: 1px 1px 3px rgba(0,0,0, 0.3);
+    }
+
+    &--reaction {
+        background-color: #eaf4fc;
+    }
+
+    &--mq {
+        background-color: #d3f9bb;
+
+        .tooltip-content & {
+            background-color: inherit;
+        }
+    }
+
+    &--reply {
+        background-color: #fff4e5;
+
+        .tooltip-content & {
+            background-color: inherit;
+        }
+    }
+
+    &--tag {
+        background-color: #fce3e3;
+    }
+
+    .tooltip-content &:hover {
+        opacity: 1;
+    }
+
+    a&:hover {
+        .m-transition(all, 0.3s, ease-in-out, 0s);
+        opacity: 0.5;
+        text-decoration: none;
+
+        .reaction-text {
+            text-decoration: none;
+        }
+    }
+}
+
+
+
+
+
+
+.p-body-sidebar {
+    [data-widget-definition="visitor_panel"] {
+        .contentRow-minor .pairs {
+            margin-right: -8px;
+
+            dt {
+                margin-right: 3px;
+
+                &:before {
+                    .m-faBase();
+                    padding-right: 2px;
+                }
+            }
+
+            &:nth-child(1) dt {
+                .m-faBefore("\f075");
+            }
+
+            &:nth-child(2) dt {
+                .m-faBefore("\f164");
+            }
+
+            &:nth-child(3) dt {
+                .m-faBefore("\f091");
+            }
+        }
+    }
+}
+
+
+.block {
+    h3:before {
+        display: inline-block;
+        .m-faBase();
+        padding-right: 3px;
+    }
+
+    &[data-widget-section="staffMembers"] {
+        h3 {
+            .m-faBefore("\f0e3");
+        }
+    }
+
+    &[data-widget-section="onlineNow"] {
+        h3 {
+            .m-faBefore("\f007")
+        }
+    }
+
+    &[data-widget-definition="new_profile_posts"] {
+        h3 {
+            .m-faBefore("\f086")
+        }
+    }
+
+    &[data-widget-definition="forum_statistics"] {
+        h3 {
+            .m-faBefore("\f080")
+        }
+    }
+
+    &[data-widget-definition="share_page"] {
+        h3 {
+            .m-faBefore("\f14d")
+        }
+    }
+
+    &[data-widget-definition="find_member"] {
+        h3 {
+            .m-faBefore("\f002")
+        }
+    }
+
+    &[data-widget-definition="newest_members"] {
+        h3 {
+            .m-faBefore("\f234")
+        }
+    }
+
+    &[data-widget-definition="birthdays"] {
+        h3 {
+            .m-faBefore("\f1fd")
+        }
+    }
+
+    &[data-widget-definition="xfrm_new_resources"] {
+        h3 {
+            .m-faBefore("\f187")
+        }
+    }
+
+    &[data-widget-definition="xfrm_top_resources"] {
+        h3 {
+            .m-faBefore("\f091")
+        }
+    }
+
+    &[data-widget-definition="xfrm_latest_reviews"] {
+        h3 {
+            .m-faBefore("\f005")
+        }
+    }
+
+    &[data-widget-key="xfrm_overview_top_authors"] {
+        h3.block-minorHeader {
+            .m-faBefore("\f201")
+        }
+    }
+}
+
+
+
+
+.TherdTitle {
+    float: right;
+    margin-right: 10px;
+    color: #00f;
+    font-family: 'Droid Arabic Kufi',sans-serif;
+    font-weight: 400;
+}
+@media screen and (max-width: 450px) {
+.TherdTitle {
+	display: none;
+}
+}
+
+
+
+
+
+/* Source thread */
+.PrevNextThread {
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    color: #0027B0;
+    font-weight: lighter;
+}
+.PrevNextThread a {
+    background-color: #DBECC0;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 1px solid #B5CD8E;
+    box-shadow: 0px 0px 3px #E2E2E2;
+    border-radius: 5px;
+    color: #4C6A13;
+    font-weight: lighter;
+} 
+    @media (max-width: @xf-responsiveNarrow)
+{
+        .PrevNextThread a 
+     {
+    background-color: transparent;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 0;
+    box-shadow: 0px 0px 3px transparent;
+    border-radius: 0;
+    color: #4C6A13;
+    font-weight: lighter;
+        }
+    }
+//***EnD Source thread****//
+
+
+
+
+
+
+.quick_info{
+text-align: center;
+padding: 6px 10px 10px 10px;
+color:#f00;
+font-size: 12pt;
+font-weight: bold;
+}
+
+
+
+
+.manageralert{
+margin:25px 0;
+    color:#111;
+}
+.alert-content , .alerticon{
+    background:#fff;
+    border:1px solid #ccc;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+}
+.alert-content {
+    margin-left:90px;
+    padding:15px;
+    position:relative;
+}
+.alert-content:before , .alert-content:after{
+    content:'';
+    display:block;
+    border-right:20px solid #fff;
+    border-bottom:15px solid transparent;
+position:absolute;
+left:-20px;
+top:15px;
+z-index:10
+}
+.alert-content:after{
+    border-right:23px solid #ccc;
+    border-bottom:18px solid transparent;
+left:-23px;
+top:14px;
+    z-index:9
+}
+.alert-content h3 {
+padding:0;
+margin:0 0 10px;
+}
+.alert-content h3 label{
+display:inline-block;
+font-weight:bold;
+    padding:0 0 3px;
+    border-bottom:2px solid;
+    margin-left:7px;
+}
+.alert-content p{
+margin:0;
+padding:0;
+}
+.alerticon{
+    float:left;
+    border-radius:50%;
+    -webkit-border-radius:50%;
+        -moz-border-radius:50%;
+    width:70px;
+height:70px;
+    line-height:70px;
+    text-align:center;
+    font-size:23px;
+    margin-top:10px;
+}
+
+
+
+
+
+.ctaLogoText,
+.ctaLogoTextSmall
+{
+    font-size: 20px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.ctaLogoTextSmall
+{
+    font-size: 25px;
+}
+
+.p-nav-smallLogo
+{
+    max-width: 140px;
+}
+
+.p-nav-smallLogo a
+{
+    text-decoration: none;
+}
+
+.p-nav-smallLogo img
+{
+    display: inline;
+}
+
+.p-header-content
+{
+    padding: 0 0;
+}
+
+
+
+
+
+.message.message--quickReply .message-cell--user {
+    display: none;
+}
+.message.message--quickReply .message-cell.message-cell--main {
+    padding-left: 10px;
+}
+
+
+
+
+
+
+.block--messages .message-userExtras{font-size:11px;color:#32444f}  
+  
+ .message-innerFirst .User-InfoPost{width:380px;margin:0 auto;padding-top:15px;display:block;float:left}  
+ 
+ 
+
+
+.block--messages .message-cell.message-cell--user{flex:0 0 180px} 
+
+ .block--messages .message-userExtras{         font-size:11px;color:#01445f}  
+ 
+ 
+ 
+.message-userExtras dl {
+ padding: 5px 8px 5px 25px;
+ background-color: #fff;
+  margin: 0 0 3px;
+    position: relative;
+    
+    height: 24px;
+    border: 1px solid #e4e4e4; 
+	 
+  	border-right: 5px solid #43859B;
+	font-family: "Droid Arabic Kufi","tahoma",sans-serif;
+font-size: 9px;
+font-weight: normal;
+         
+	 border-bottom: @xf-borderSize #323232 solid;border-radius: 5px; 
+	box-shadow: 0 0 3px 0 rgba(159,152,152,0.75);
+} 
+ 
+ .message-userExtras dl:nth-child(even){
+background:#eaf8ff;
+}
+
+
+
+.message-userExtras dl i {
+ position: absolute;
+ top: 0;
+left: 0;
+ width: 24px;
+ height: 24px;
+  border-left: 5px solid #43859B;
+    color: #2C4255;
+    display: block;
+    text-align: center;
+    line-height: 20px;
+    font-size: 13px;
+    font-weight: lighter;  
+	}
+	
+.pairs.pairs--justified > dt {
+    color: #212121;
+} 
+
+
+
+
+ 
+.message-userTitle{ 
+  background: #b5be50;
+                  color:#323232;
+	
+  border:1px solid #ccc;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+         padding: 3px;    
+line-height: 1.4;
+font-weight: 600;
+
+margin:8px 0 8px; 
+box-shadow: 0 0 3px 0 rgba(159,152,152,0.75); 
+
+	border-left: 5px solid #323232; 
+		border-right: 5px solid #323232;  
+	font-size:13px;	
+		
+		
+}
+
+
+
+
+
+
+
+/* كود أيقونات بصفحة قائمة أبرز الأعضاء */
+[data-template="member_notable"] .p-body-sideNavContent a.blockLink,
+&[data-template="member_notable"] h3.block-textHeader a {
+    &:before {
+        .m-faBase();
+        padding-right: 5px;
+    }
+    &[href*="members/"]:before {
+        .m-faContent(@fa-var-ellipsis-h-alt);
+    }
+    &[href*="key=most_messages"]:before {
+        .m-faContent(@fa-var-comments);
+    }
+    &[href*="key=highest_reaction_score"]:before {
+        .m-faContent(@fa-var-thumbs-up);
+    }
+    &[href*="key=most_points"]:before {
+        .m-faContent(@fa-var-dot-circle);
+    }
+    &[href*="key=xfrm_most_resources"]:before {
+        .m-faContent(@fa-var-cog);
+    }
+    &[href*="key=xfmg_most_media_items"]:before {
+        .m-faContent(@fa-var-images);
+    }
+    &[href*="key=xfmg_most_albums"]:before {
+        .m-faContent(@fa-var-image);
+    }
+    &[href*="key=todays_birthdays"]:before {
+        .m-faContent(@fa-var-gift);
+    }
+    &[href*="key=staff_members"]:before {
+        .m-faContent(@fa-var-user-tie);
+    }
+}
+/*****/
+
+
+
+
+
+
+.message-name{
+ background: #fcfcfb;
+         color:  #C1730E; 
+    
+  border:1px solid #ccc;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+         padding: 4px;   
+line-height: 1.4;
+font-weight: 600;
+
+margin:0px auto 8px;
+box-shadow: 0 0 3px 0 rgba(159,152,152,0.75);
+
+}
+.message-userTitle{
+  background: #E6C260;
+         color:  #323232; 
+    
+  border:1px solid #ccc;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+         padding: 4px;   
+line-height: 1.4;
+font-weight: 600;
+
+margin:8px 0 8px;
+box-shadow: 0 0 3px 0 rgba(159,152,152,0.75);
+}
+
+
+.message-user{
+  background: #C5E2E6;
+         color:  #323232; 
+    
+  border:1px solid #ccc;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+         padding: 8px;   
+line-height: 1.4;
+font-weight: 600;
+
+margin:8px 0 8px;
+box-shadow: 0 0 3px 0 rgba(159,152,152,0.75);
+}
+
+
+/** متصل و غير متصل مثل انستجرام **/
+.xgt-avatar{
+    display: block;
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border-radius: 50%;
+    padding: 4px;
+    box-shadow: 0px 0px 10px 3px rgba(178, 34, 34, 0.38); 
+
+}
+
+.xgt-avatar-border{
+    display: block;
+    border: 4px solid #fff;
+    border-radius: 50%;
+}
+
+@media (max-width: @xf-publicNavCollapseWidth)
+{
+.xgt-avatar{
+    padding: 2px;
+    }
+.xgt-avatar-border{
+      border-width: 2px;
+    }
+}
+
+.xgt-avatar2{
+    display: block;
+    background: linear-gradient(to right, green, yellow);
+    border-radius: 50%;
+    padding: 4px;
+    box-shadow: 0px 0px 10px 3px rgba(4, 90, 15, 0.38);
+
+}
+
+.xgt-avatar-border2{
+    display: block;
+    border: 4px solid #fff;
+    border-radius: 50%;
+}
+
+@media (max-width: @xf-publicNavCollapseWidth)
+{
+.xgt-avatar2{
+    padding: 2px;
+    }
+.xgt-avatar-border2{
+      border-width: 2px;
+    }
+}
+/**/
+
+
+
+
+
+.Sign-Block{
+	background: #f6f6f6;
+    border: 1px solid #ececec;
+    padding: 12px;
+    position: relative;
+    text-align: center;
+    border-radius: 5px;
+    margin: 20px;
+    width: auto;
+}
+.Sign-Block h6 {
+	background: #f6f6f6;
+    border: 2px solid #fff;
+    border-radius: 30px;
+    margin: -30px auto 14px;
+    position: relative;
+    font-family: 'Droid Arabic Kufi';
+    font-size: 12px;
+    color: #7a7676;
+    font-weight: bold;
+    width: 200px;
+    height: 35px;
+    line-height: 35px;
+}
+.Sign-Content {
+    font-family: 'Droid Arabic Kufi';
+	font-size: 12px;
+	color: #7a7676;
+    font-weight: lighter;
+}
+@media (max-width: 480px)
+{
+    .Sign-Block { display: block !important; }
+}
+
+
+
+
+
+/** Float Down the Topic Scoring Buttons @ XNFORO.IR **/
+.message-cell.message-cell--vote {
+    display: flex;
+    align-items: center;
+}
+/** Float Down the Topic Scoring Buttons @ XNFORO.IR **/
+
+
+
+/** Resize images in post @ XNFORO.IR **/
+.message-body img {
+max-width: 350px !important;
+max-height: 350px !important;
+}
+/** Resize images in post @ XNFORO.IR **/
+
+
+
+.block.block--category.block--category .block-header{text-align: center;}
+
+
+
+
+
+@resource-grid-gap: 12px;
+@resource-grid-width: 332px;
+@resource-grid-thumb: 110px;
+@media (min-width: @xf-responsiveMedium){ @supports(display: grid){ .block[data-type="resource"] .structItemContainer{ display: grid; grid-template-columns: repeat(auto-fit, minmax(@resource-grid-width, 1fr)); grid-gap: @resource-grid-gap; padding: @resource-grid-gap; background-color: @xf-contentAltBg; } .structItem--resource { background-color: @xf-contentBg; border-radius: 3px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); border-width: 0px; display: grid; grid-template-columns: @resource-grid-thumb 1fr; grid-template-areas: 'icon text' 'stats stats'; .structItem-cell--icon.structItem-cell--iconExpanded{ width: auto; grid-area: icon; } .structItem-cell--main { grid-area: text; } .structItem-cell--resourceMeta { grid-area: stats; width: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; } .structItem-cell--iconExpanded .structItem-iconContainer .avatar { width: 100%; height: auto; font-size: 56px; } .structItem-secondaryIcon { display: none; } .structItem-metaItem--rating{ flex: 1 0 100%; } .structItem-metaItem--downloads, .structItem-metaItem--lastUpdate{ flex: 0 1 auto; } .ratingStarsRow--justified { border-bottom: 1px solid @xf-borderColorFaint; margin-bottom: 4px; padding-bottom: 4px; } } }
+}
+
+/* [cXF] Navigation tab icons 2.2 */
+.p-navEl a, .menu-linkRow, .offCanvasMenu--nav .js-offCanvasNavTarget a {
+
+    &:before {
+        .m-faBase();
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    &[data-nav-id='home']:before {.m-faContent(@fa-var-home);}
+    &[data-nav-id='forums']:before {.m-faContent(@fa-var-comments);}
+    &[data-nav-id='whatsNew']:before {.m-faContent(@fa-var-bolt);}
+    &[data-nav-id='members']:before {.m-faContent(@fa-var-users);}
+    &[data-nav-id='xfrm']:before {.m-faContent(@fa-var-download);}
+    &[data-nav-id='xfmg']:before {.m-faContent(@fa-var-camera);}
+	&[data-nav-id='quran']:before {.m-faContent(@fa-var-file-audio);}
+
+    /* Forums subnavigation */
+    &[data-nav-id='newPosts']:before {.m-faContent(@fa-var-search-plus);}
+    &[data-nav-id='findThreads']:before {.m-faContent(@fa-var-search);}
+    /* Find threads menu */
+    &[data-nav-id='yourThreads']:before {.m-faContent(@fa-var-search); margin-right: 15px;}
+    &[data-nav-id='contributedThreads']:before {.m-faContent(@fa-var-search); margin-right: 15px;}
+    &[data-nav-id='unansweredThreads']:before {.m-faContent(@fa-var-search); margin-right: 15px;}
+    /*****/
+    &[data-nav-id='searchForums']:before {.m-faContent(@fa-var-search);}
+    &[data-nav-id='watched']:before {.m-faContent(@fa-var-eye);}
+    /* Watched forums menu */
+    &[data-nav-id='watchedThreads']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    &[data-nav-id='watchedForums']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    /*****/
+    &[data-nav-id='markForumsRead']:before {.m-faContent(@fa-var-eye-slash);}
+    /* WhatsNew subnavigation */
+    &[data-nav-id='whatsNewPosts']:before {.m-faContent(@fa-var-pencil);}
+    &[data-nav-id='whatsNewProfilePosts']:before {.m-faContent(@fa-var-rss);}
+    &[data-nav-id='whatsNewNewsFeed']:before {.m-faContent(@fa-var-star);}
+    &[data-nav-id='xfmgWhatsNewNewMedia']:before {.m-faContent(@fa-var-images);}
+    &[data-nav-id='xfmgWhatsNewMediaComments']:before {.m-faContent(@fa-var-comments);}
+    &[data-nav-id='xfrmNewResources']:before {.m-faContent(@fa-var-download);}
+    &[data-nav-id='latestActivity']:before {.m-faContent(@fa-var-trophy);}
+    /* XFMG subnavigation */
+    &[data-nav-id='xfmgNewMedia']:before {.m-faContent(@fa-var-images);}
+    &[data-nav-id='xfmgNewComments']:before {.m-faContent(@fa-var-comments);}
+    &[data-nav-id='xfmgAddMedia']:before {.m-faContent(@fa-var-plus-square);}
+    &[data-nav-id='xfmgYourContent']:before {.m-faContent(@fa-var-user);}
+    /* Your content menu */
+    &[data-nav-id='xfmgYourMedia']:before {.m-faContent(@fa-var-user); margin-right: 15px;}
+    &[data-nav-id='xfmgYourAlbums']:before {.m-faContent(@fa-var-user); margin-right: 15px;}
+    /*****/
+    &[data-nav-id='xfmgWatchedContent']:before {.m-faContent(@fa-var-eye);}
+    /* Watched media menu */
+    &[data-nav-id='xfmgWatchedMedia']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    &[data-nav-id='xfmgWatchedAlbums']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    &[data-nav-id='xfmgWatchedCategories']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    /*****/
+    &[data-nav-id='xfmgSearchMedia']:before {.m-faContent(@fa-var-search);}
+    &[data-nav-id='xfmgMarkViewed']:before {.m-faContent(@fa-var-eye-slash);}
+    /* XFRM subnavigation */
+    &[data-nav-id='xfrmLatestReviews']:before {.m-faContent(@fa-var-balance-scale);}
+    &[data-nav-id='xfrmYourResources']:before {.m-faContent(@fa-var-user);}
+    &[data-nav-id='xfrmWatched']:before {.m-faContent(@fa-var-eye);}
+    /* Watched resources menu */
+    &[data-nav-id='xfrmWatchedResources']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    &[data-nav-id='xfrmWatchedCategories']:before {.m-faContent(@fa-var-eye); margin-right: 15px;}
+    /*****/
+    &[data-nav-id='xfrmSearchResources']:before {.m-faContent(@fa-var-search);}
+    /* Members subnavigation */
+    &[data-nav-id='currentVisitors']:before {.m-faContent(@fa-var-user-plus);}
+    &[data-nav-id='newProfilePosts']:before {.m-faContent(@fa-var-pencil);}
+    &[data-nav-id='searchProfilePosts']:before {.m-faContent(@fa-var-user-secret);}
+}
+/* [cXF] Navigation tab icons 2.2 */
+
+
+
+
+
+/* Source thread */
+.PrevNextThread {
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    color: #0027B0;
+    font-weight: lighter;
+}
+.PrevNextThread a {
+    background-color: #DBECC0;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 1px solid #B5CD8E;
+    box-shadow: 0px 0px 3px #E2E2E2;
+    border-radius: 5px;
+    color: #4C6A13;
+    font-weight: lighter;
+} 
+    @media (max-width: @xf-responsiveNarrow)
+{
+        .PrevNextThread a 
+     {
+    background-color: transparent;
+    margin: 4px;
+    padding: 2px 4px 2px 4px;
+    font-family: "Droid Arabic Kufi","Open Sans",sans-serif;
+    font-size: 13px;
+    border: 0;
+    box-shadow: 0px 0px 3px transparent;
+    border-radius: 0;
+    color: #4C6A13;
+    font-weight: lighter;
+        }
+    }
+//***EnD Source thread****// 
+
+
+
+
+/*** كود توسيط الوسائط ***/
+.bbMediaWrapper
+{
+    margin: 0 auto;
+}
+
+
+
+
+
+.TherdTitle {
+    float: right;
+    margin-right: 10px;
+    color: #00f;
+    font-family: 'Droid Arabic Kufi',sans-serif;
+    font-weight: 400;
+}
+@media screen and (max-width: 450px) {
+.TherdTitle {
+	display: none;
+}
+}
+
+
+
+
+
+.button, a.button{
+color:#0A3F63;
+line-height: 1.4;
+font-family: "Droid Arabic Kufi","tahoma",sans-serif;
+font-weight: 700;
+font-size: 12px;
+
+padding-left:8px;
+padding-right:8px;
+padding-top:6px;
+padding-bottom:6px;
+background-color:#FFFFFF;
+ border:1px solid #ccc;
+border-top-left-radius:17px;
+border-top-right-radius:0;
+border-bottom-right-radius:17px;
+border-bottom-left-radius:0;
+box-shadow:0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: @xf-publicNavCollapseWidth)
+{
+.xgt-avatar2{
+    padding: 2px;
+    }
+.xgt-avatar-border2{
+      border-width: 2px;
+    }
+}
+
+
+
+html::-webkit-scrollbar {
+    width: 11px;
+    background: #185886;
+}
+html::-webkit-scrollbar-thumb {
+    background: #2577b1;
+}
+html {
+    scrollbar-color: #2577b1 #185886;
+}
+
+
+
+
+
+.tc_partners_custom_block_container_sidebar {
+    line-height: 25px;
+    height: 160px;
+    font-size: 12pt;
+    font-family: serif;
+    margin-left: 10px;
+}
+.tc_partners_custom_block_container_sidebar .fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 5px;
+}
+.partners_info_1 a { color: rgb(39, 68, 114); }
+.partners_info_1 { padding-right: 15px; }
+.partners_info_2 { padding-right: 15px; }
+.partners_info_3 { padding-right: 15px; }
+.partners_info_4 { padding-right: 15px; }
+.partners_info_5 { padding-right: 15px; }
+.partners_info_6 { padding-right: 15px; }
+.partners_info_7 { padding-right: 15px; }
+.partners_info_8 { padding-right: 15px; }]]></template>
+    <template title="forum_view" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[<xf:title page="{$page}">{$forum.Node.title}</xf:title>
+<xf:description>{$forum.Node.description|raw}</xf:description>
+
+<xf:css src="structured_list.less" />
+
+<xf:if is="!$forum.isSearchEngineIndexable()">
+	<xf:head option="metaNoindex"><meta name="robots" content="noindex" /></xf:head>
+</xf:if>
+
+<xf:macro template="metadata_macros" name="canonical_url"
+	arg-canonicalUrl="{{ link('canonical:forums', $forum, $canonicalFilters + {'page': $page}) }}" />
+
+<xf:head option="rss_forum"><link rel="alternate" type="application/rss+xml" title="{{ phrase('rss_feed_for_x', {'title': $forum.title})|for_attr }}" href="{{ link('forums/index.rss', $forum) }}" /></xf:head>
+
+<xf:macro template="forum_macros" name="forum_page_options" arg-forum="{$forum}" />
+<xf:breadcrumb source="$forum.getBreadcrumbs(false)" />
+<xf:breadcrumb href="">{$forum.title}</xf:breadcrumb>
+<xf:button icon="prev" href="{{ link('forums', $thread.Forum) }}">أرجع للقسم</xf:button>
+<xf:pageaction if="$forum.canCreateThread() OR $forum.canCreateThreadPreReg()">
+	<xf:button href="{{ link('forums/post-thread', $forum) }}" class="button--cta" icon="write" rel="nofollow">
+		{{ phrase('post_thread') }}
+	</xf:button>
+</xf:pageaction>
+
+<xf:if is="$pendingApproval">
+	<div class="blockMessage blockMessage--important">{{ phrase('content_submitted_displayed_pending_approval') }}</div>
+</xf:if>
+
+<xf:extension name="above_node_list"></xf:extension>
+
+<xf:if is="$nodeTree">
+	<xf:ad position="forum_view_above_node_list" arg-forum="{$forum}" />
+	<div class="block">
+		<div class="block-container">
+			<div class="block-body">
+				<xf:macro template="forum_list" name="node_list"
+					arg-children="{$nodeTree}"
+					arg-extras="{$nodeExtras}"
+					arg-depth="2" />
+			</div>
+		</div>
+	</div>
+	<xf:ad position="forum_view_below_node_list" arg-forum="{$forum}" />
+</xf:if>
+
+<xf:if is="$canInlineMod">
+	<xf:js src="xf/inline_mod.js" min="1" />
+</xf:if>
+
+<xf:extension name="above_thread_list"></xf:extension>
+<xf:ad position="forum_view_above_thread_list" arg-forum="{$forum}" />
+
+<xf:extension name="thread_list_block_classes" value="" />
+<div class="block {{ extension_value('thread_list_block_classes') }}" data-xf-init="{{ $canInlineMod ? 'inline-mod' : '' }}" data-type="thread" data-href="{{ link('inline-mod') }}">
+
+	<div class="block-outer"><xf:trim>
+		<xf:pagenav page="{$page}" perpage="{$perPage}" total="{$total}"
+			link="forums" data="{$forum}" params="{$filters}"
+			wrapperclass="block-outer-main" />
+		<xf:if contentcheck="true">
+			<div class="block-outer-opposite">
+				<div class="buttonGroup">
+				<xf:contentcheck>
+					<xf:if is="$canInlineMod">
+						<xf:macro template="inline_mod_macros" name="button" />
+					</xf:if>
+					<xf:if is="$xf.visitor.user_id">
+						<xf:button href="{{ link('forums/mark-read', $forum, {'date': $xf.time}) }}"
+							class="button--link" overlay="true">
+							{{ phrase('mark_read') }}
+						</xf:button>
+					</xf:if>
+					<xf:if is="$forum.canWatch()">
+						<xf:button href="{{ link('forums/watch', $forum) }}" class="button--link"
+							data-xf-click="switch-overlay"
+							data-sk-watch="{{ phrase('watch') }}"
+							data-sk-unwatch="{{ phrase('unwatch') }}">
+							<xf:if is="{$forum.Watch.{$xf.visitor.user_id}}">{{ phrase('unwatch') }}<xf:else />{{ phrase('watch') }}</xf:if>
+						</xf:button>
+					</xf:if>
+				</xf:contentcheck>
+				</div>
+			</div>
+		</xf:if>
+	</xf:trim></div>
+
+
+	<div class="block-container">
+
+		<xf:extension name="thread_list_header">
+			<div class="block-filterBar">
+				<div class="filterBar">
+					<xf:if contentcheck="true">
+						<ul class="filterBar-filters">
+						<xf:contentcheck>
+							<xf:extension name="filters">
+								<xf:macro name="filters"
+									arg-forum="{$forum}"
+									arg-filters="{$filters}"
+									arg-starterFilter="{$starterFilter}"
+									arg-threadTypeFilter="{$threadTypeFilter}" />
+							</xf:extension>
+						</xf:contentcheck>
+						</ul>
+					</xf:if>
+
+					<a class="filterBar-menuTrigger" data-xf-click="menu" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true">{{ phrase('filters') }}</a>
+					<div class="menu menu--wide" data-menu="menu" aria-hidden="true"
+						data-href="{{ link('forums/filters', $forum, $filters) }}"
+						data-load-target=".js-filterMenuBody">
+						<div class="menu-content">
+							<h4 class="menu-header">{{ phrase('show_only:') }}</h4>
+							<div class="js-filterMenuBody">
+								<div class="menu-row">{{ phrase('loading...') }}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</xf:extension>
+
+		<xf:set var="$qtPos">{{ ($sortInfo.order == 'last_post_date' && $sortInfo.direction == 'asc') ? 'bottom' : 'top' }}</xf:set>
+
+		<div class="block-body">
+			<xf:extension name="thread_list">
+				<div class="structItemContainer">
+					<xf:macro name="{{ $templateOverrides.quick_thread_macro ?: 'thread_list_macros::quick_thread' }}"
+						arg-forum="{$forum}"
+						arg-page="{$page}"
+						arg-order="{$sortInfo.order}"
+						arg-direction="{$sortInfo.direction}"
+						arg-prefixes="{$quickThreadPrefixes}"
+						args="{$templateOverrides.quick_thread_macro_args}" />
+
+					<xf:if is="$stickyThreads is not empty OR $threads is not empty">
+						<xf:if is="$stickyThreads is not empty">
+							<div class="structItemContainer-group structItemContainer-group--sticky">
+								<xf:foreach loop="$stickyThreads" value="$thread">
+									<xf:macro name="{{ $templateOverrides.thread_list_macro ?: 'thread_list_macros::item' }}"
+										arg-thread="{$thread}"
+										arg-forum="{$forum}"
+										args="{$templateOverrides.thread_list_macro_args}" />
+								</xf:foreach>
+							</div>
+
+							<xf:ad position="forum_view_below_stickies" arg-forum="{$forum}" />
+						</xf:if>
+
+						<div class="structItemContainer-group js-threadList">
+							<xf:if is="$threads is not empty">
+								<xf:foreach loop="$threads" value="$thread">
+									<xf:macro name="{{ $templateOverrides.thread_list_macro ?: 'thread_list_macros::item' }}"
+										arg-thread="{$thread}"
+										arg-forum="{$forum}"
+										args="{$templateOverrides.thread_list_macro_args}"  />
+								</xf:foreach>
+								<xf:if is="$showDateLimitDisabler">
+									<xf:macro name="date_limit_disabler" arg-forum="{$forum}" arg-page="{$page}" arg-filters="{$filters}" />
+								</xf:if>
+							</xf:if>
+						</div>
+					<xf:elseif is="$filters" />
+						<div class="structItemContainer-group js-threadList">
+							<div class="structItem js-emptyThreadList">
+								<div class="structItem-cell">{{ phrase('there_no_threads_matching_your_filters') }}</div>
+							</div>
+							<xf:if is="$showDateLimitDisabler">
+								<xf:macro name="date_limit_disabler" arg-forum="{$forum}" arg-page="{$page}" arg-filters="{$filters}" />
+							</xf:if>
+						</div>
+					<xf:else />
+						<div class="structItemContainer-group js-threadList">
+							<xf:if is="$showDateLimitDisabler">
+								<div class="structItem js-emptyThreadList">
+									<div class="structItem-cell">{{ phrase('there_no_threads_to_display') }}</div>
+								</div>
+								<xf:macro name="date_limit_disabler" arg-forum="{$forum}" arg-page="{$page}" arg-filters="{$filters}" />
+							<xf:else />
+								<div class="structItem js-emptyThreadList">
+									<div class="structItem-cell">{{ phrase('there_no_threads_in_this_forum') }}</div>
+								</div>
+							</xf:if>
+						</div>
+					</xf:if>
+				</div>
+			</xf:extension>
+		</div>
+	</div>
+	<div class="block-outer block-outer--after">
+		<xf:pagenav
+			page="{$page}" perpage="{$perPage}" total="{$total}"
+			link="forums" data="{$forum}" params="{$filters}"
+			wrapperclass="block-outer-main" />
+		<xf:showignored wrapperclass="block-outer-opposite" />
+		<xf:if is="!$forum.canCreateThread() AND !$forum.canCreateThreadPreReg()">
+			<div class="block-outer-opposite">
+				<xf:if is="$xf.visitor.user_id">
+					<span class="button button--wrap is-disabled">
+						{{ phrase('no_permission_to_post') }}
+						<!-- this is not interactive so shouldn't be a button element -->
+					</span>
+				<xf:else />
+					<xf:button href="{{ link('login') }}" class="button--link button--wrap" overlay="true">
+						{{ phrase('log_in_or_register_to_post') }}
+					</xf:button>
+				</xf:if>
+			</div>
+		</xf:if>
+	</div>
+</div>
+
+<xf:ad position="forum_view_below_thread_list" arg-forum="{$forum}" />
+<xf:extension name="below_thread_list"></xf:extension>
+
+<xf:widgetpos id="forum_view_sidebar" context-forum="{$forum}" position="sidebar" />
+
+<xf:macro name="filters" arg-forum="!" arg-filters="!" arg-starterFilter="{{ null }}" arg-threadTypeFilter="{{ null }}">
+	<xf:set var="$dateLimits" value="{{ {
+		'-1': phrase('any_time'),
+		'7': phrase('x_days', {'days': '7'}),
+		'14': phrase('x_days', {'days': '14'}),
+		'30': phrase('x_days', {'days': '30'}),
+		'60': phrase('x_months', {'months': '2'}),
+		'90': phrase('x_months', {'months': '3'}),
+		'182': phrase('x_months', {'months': '6'}),
+		'365': phrase('1_year')
+	} }}" />
+
+	<xf:extension name="start"></xf:extension>
+
+	<xf:extension name="prefix_id">
+		<xf:if is="$filters.prefix_id">
+			<li><a href="{{ link('forums', $forum, $filters|replace('prefix_id', null)) }}"
+				class="filterBar-filterToggle" data-xf-init="tooltip" title="{{ phrase('remove_this_filter')|for_attr }}">
+				<span class="filterBar-filterToggle-label">{{ phrase('prefix:') }}</span>
+				{{ prefix_title('thread', $filters.prefix_id) }}</a></li>
+		</xf:if>
+	</xf:extension>
+
+	<xf:extension name="starter_id">
+		<xf:if is="$filters.starter_id AND $starterFilter">
+			<li><a href="{{ link('forums', $forum, $filters|replace('starter_id', null)) }}"
+				class="filterBar-filterToggle" data-xf-init="tooltip" title="{{ phrase('remove_this_filter')|for_attr }}">
+				<span class="filterBar-filterToggle-label">{{ phrase('started_by:') }}</span>
+				{$starterFilter.username}</a></li>
+		</xf:if>
+	</xf:extension>
+
+	<xf:extension name="thread_type">
+		<xf:if is="$filters.thread_type && $threadTypeFilter">
+			<li><a href="{{ link('forums', $forum, $filters|replace('thread_type', null)) }}"
+				class="filterBar-filterToggle" data-xf-init="tooltip" title="{{ phrase('remove_this_filter')|for_attr }}">
+				<span class="filterBar-filterToggle-label">{{ phrase('thread_type_filter:') }}</span>
+				{{ $threadTypeFilter.getTypeTitle() }}</a></li>
+		</xf:if>
+	</xf:extension>
+
+	<xf:extension name="last_days">
+		<xf:if is="$filters.last_days AND {$dateLimits.{$filters.last_days}}">
+			<li><a href="{{ link('forums', $forum, $filters|replace('last_days', null)) }}"
+				class="filterBar-filterToggle" data-xf-init="tooltip" title="{{ phrase('remove_this_filter')|for_attr }}">
+				<span class="filterBar-filterToggle-label">{{ phrase('last_updated:') }}</span>
+				{$dateLimits.{$filters.last_days}}</a></li>
+		</xf:if>
+	</xf:extension>
+
+	<xf:extension name="order">
+		<xf:if is="$filters.order">
+			<li><a href="{{ link('forums', $forum, $filters|replace({'order': null, 'direction': null})) }}"
+				class="filterBar-filterToggle" data-xf-init="tooltip" title="{{ phrase('return_to_default_order')|for_attr }}">
+				<span class="filterBar-filterToggle-label">{{ phrase('sort_by:') }}</span>
+				{{ phrase_dynamic('forum_sort.' . $filters.order) }}
+				<xf:fa icon="{{ $filters.direction == 'asc' ? 'fa-angle-up' : 'fa-angle-down' }}" />
+				<span class="u-srOnly"><xf:if is="$filters.direction == 'asc'">{{ phrase('ascending') }}<xf:else />{{ phrase('descending') }}</xf:if></span>
+			</a></li>
+		</xf:if>
+	</xf:extension>
+
+	<xf:extension name="end"></xf:extension>
+</xf:macro>
+
+<xf:macro name="date_limit_disabler" arg-forum="!" arg-page="!" arg-filters="!">
+	<div class="structItem structItem--note">
+		<div class="structItem-cell">
+			<a href="{{ link('forums', $forum, {'page': $page, 'no_date_limit': 1} + $filters) }}">
+				{{ phrase('show_older_items') }}
+			</a>
+		</div>
+	</div>
+</xf:macro>]]></template>
+    <template title="login" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[<xf:js src="xf/login_signup.js" min="1" />
+
+<xf:title>{{ phrase('log_in') }}</xf:title>
+
+<xf:head option="robots"><meta name="robots" content="noindex" /></xf:head>
+
+<xf:if is="$xf.session.preRegActionKey">
+	<div class="blockMessage blockMessage--highlight">
+		{{ phrase('pre_reg_action_notice_login') }}<br />
+		<br />
+		{{ phrase('dont_have_account_question') }}
+		<xf:button class="button--link"
+			href="{{ link('register', null, {'_xfRedirect': $redirect}) }}"
+			data-xf-click="overlay"
+		>{{ phrase('register') }}</xf:button>
+	</div>
+</xf:if>
+
+<xf:if contentcheck="true">
+	<div class="blockMessage blockMessage--error blockMessage--iconic">
+		<xf:contentcheck>{$error}</xf:contentcheck>
+	</div>
+</xf:if>
+
+<div class="blocks">
+	<xf:form action="{{ link('login/login') }}" class="block">
+		<div class="block-container">
+			<div class="block-body">
+				<xf:textboxrow name="login" value="{$login}" autofocus="autofocus" autocomplete="username"
+					label="{{ phrase('your_name_or_email_address') }}" />
+
+				<xf:passwordboxrow name="password" autocomplete="current-password"
+					label="{{ phrase('password') }}">
+
+					<xf:html>
+						<a href="{{ link('lost-password') }}" data-xf-click="overlay">{{ phrase('forgot_your_password') }}</a>
+					</xf:html>
+				</xf:passwordboxrow>
+
+				<xf:if is="$captcha">
+					<xf:captcharow label="{{ phrase('verification') }}" force="true" force-visible="true" />
+				</xf:if>
+
+				<xf:checkboxrow>
+					<xf:option name="remember" selected="true">{{ phrase('stay_logged_in') }}</xf:option>
+				</xf:checkboxrow>
+
+				<xf:hiddenval name="_xfRedirect">{$redirect}</xf:hiddenval>
+			</div>
+			<xf:submitrow icon="login" />
+		</div>
+		<xf:if is="$xf.options.registrationSetup.enabled">
+			<div class="block-outer block-outer--after">
+				<div class="block-outer-middle">
+					{{ phrase('dont_have_account_question') }} <xf:button href="{{ link('register') }}">{{ phrase('register_now') }}</xf:button>
+				</div>
+			</div>
+		</xf:if>
+	</xf:form>
+
+	<xf:if is="$providers is not empty">
+		<div class="blocks-textJoiner"><span></span><em>{{ phrase('or_separator') }}</em><span></span></div>
+
+		<div class="block">
+			<div class="block-container">
+				<div class="block-body">
+					<xf:formrow rowtype="button"
+						label="{{ phrase('log_in_using') }}">
+
+						<ul class="listHeap">
+							<xf:foreach loop="$providers" value="$provider">
+								<li>
+									<xf:macro template="connected_account_macros" name="button"
+										arg-provider="{$provider}" />
+								</li>
+							</xf:foreach>
+						</ul>
+					</xf:formrow>
+				</div>
+			</div>
+		</div>
+	</xf:if>
+</div>]]></template>
+    <template title="message_macros" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[<xf:macro name="user_info"
+    arg-user="!"
+    arg-fallbackName=""
+    arg-dateHtml=""
+    arg-linkHtml="">
+
+    <section itemscope itemtype="https://schema.org/Person" class="message-user">
+        <div class="message-avatar {{ ($xf.options.showMessageOnlineStatus && $user && $user.isOnline()) ? 'message-avatar--online' : '' }}">
+            <div class="message-avatar-wrapper">
+    <xf:if is="$xf.options.showMessageOnlineStatus && $user && $user.isOnline()">
+                <div class="xgt-avatar2">
+                        <div class="xgt-avatar-border2">
+                    <xf:avatar user="$user" size="m" defaultname="{$fallbackName}" itemprop="image" />
+                       </div>
+                </div>
+                <xf:else />
+                    <div class="xgt-avatar">
+                        <div class="xgt-avatar-border">
+                    <xf:avatar user="$user" size="m" defaultname="{$fallbackName}" itemprop="image" />
+                       </div>
+                </div>               
+                </xf:if>                <xf:if is="$xf.options.showMessageOnlineStatus && $user && $user.isOnline()">
+                    <span class="message-avatar-online" data-xf-init="tooltip" title="{{ phrase('online_now')|for_attr }}"></span>
+                </xf:if>
+            </div>
+        </div>
+      <div class="messagePostBitWrapper">
+			<div class="message-userDetails">
+				<h4 class="message-name"><xf:username user="$user" rich="true" defaultname="{$fallbackName}" itemprop="name" /></h4>
+				<xf:usertitle user="$user" tag="h5" class="message-userTitle" banner="true" itemprop="jobTitle" />
+				<xf:if is="$xf.options.showMessageOnlineStatus && $user && $user.isOnline() && ( {{ property('onlineIndicator') }} == 'userbanner')">
+					<div class="userBanner message-userBanner userBanner--online">
+						<span class="userBanner-before"></span>
+						<strong>{{ phrase('online_now')}}</strong>
+						<span class="userBanner-after"></span>
+					</div>
+				</xf:if>
+				<xf:userbanners user="$user" tag="div" class="message-userBanner" itemprop="jobTitle" />
+				<xf:if is="{$dateHtml}"><div class="message-date">{$dateHtml}</div></xf:if>
+			</div>
+			<xf:if is="{$linkHtml}"><div class="message-permalink">{$linkHtml}</div></xf:if>
+			<xf:if is="$user.user_id">
+				<xf:set var="$extras" value="{{ property('messageUserElements') }}" />
+				<xf:if contentcheck="true">
+					 
+<div class="message-userExtras" style="display: none;">
+				<xf:contentcheck>
+					<xf:if is="$extras.register_date">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-sign-in-alt"></i>{{ phrase('joined') }}</dt>
+							<dd>{{ date($user.register_date) }}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$extras.message_count">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-comment-dots"></i>{{ phrase('messages') }}</dt>
+							<dd>{$user.message_count|number}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$extras.reaction_score">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-heart"></i>{{ phrase('reaction') }}</dt>
+							<dd>{$user.reaction_score|number}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$extras.trophy_points && $xf.options.enableTrophies">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-star-half-alt"></i>{{ phrase('points') }}</dt>
+							<dd>{$user.trophy_points|number}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$extras.age && $user.Profile.age">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-user-alt"></i>{{ phrase('age') }}</dt>
+							<dd>{$user.Profile.age}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$extras.location && $user.Profile.location">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fas fa-search-location"></i>{{ phrase('location') }}</dt>
+							<dd>
+								<xf:if is="$xf.options.geoLocationUrl">
+									<a href="{{ link('misc/location-info', '', {'location': $user.Profile.location}) }}" rel="nofollow noreferrer" target="_blank" class="u-concealed">{$user.Profile.location}</a>
+								<xf:else />
+									{$user.Profile.location}
+								</xf:if>
+							</dd>
+						</dl>
+					</xf:if>
+					
+					<xf:if is="$extras.website && $user.Profile.website">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-weebly"></i>{{ phrase('web') }}</dt>
+<dd><a href="{$user.Profile.website}" rel="nofollow" target="_blank">{$user.Profile.website|url('host', phrase('visit_site'))}</a></dd>
+						</dl>
+						<xf:if is="$user.Profile.custom_fields.Pinterest">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-pinterest"></i>Pinterest</dt>
+							<dd>{$user.Profile.custom_fields.Pinterest}</dd>
+						</dl>
+					</xf:if>
+					</xf:if>
+					<xf:if is="$user.Profile.custom_fields.facebook">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-facebook-f"></i>Facebook</dt>
+							<dd>{$user.Profile.custom_fields.facebook}</dd>
+						</dl>
+					</xf:if>
+						<xf:if is="$user.Profile.custom_fields.instagram">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-instagram"></i>insta</dt>
+							<dd>{$user.Profile.custom_fields.instagram}</dd>
+						</dl>
+					</xf:if>					
+
+					<xf:if is="$user.Profile.custom_fields.twitter">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-twitter"></i>Twitter</dt>
+							<dd>{$user.Profile.custom_fields.twitter}</dd>
+						</dl>
+					</xf:if>					
+				
+					<xf:if is="$user.Profile.custom_fields.skype">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-skype"></i></dt>
+							<dd>{$user.Profile.custom_fields.skype}</dd>
+						</dl>
+					</xf:if>
+					<xf:if is="$user.Profile.custom_fields.gmail">
+						<dl class="pairs pairs--justified">
+							<dt><i class="fab fa-google"></i></dt>
+							<dd>{$user.Profile.custom_fields.gmail}</dd>
+						</dl>
+					</xf:if>
+									<xf:if is="$extras.custom_fields">
+										<xf:macro template="custom_fields_macros" name="custom_fields_values"
+											arg-type="users"
+											arg-group="personal"
+											arg-set="{$user.Profile.custom_fields}"
+											arg-additionalFilters="{{ ['message'] }}"
+											arg-valueClass="pairs pairs--justified"
+										/>
+										<xf:if is="$user.canViewIdentities()">
+											<xf:macro template="custom_fields_macros" name="custom_fields_view"
+												arg-type="users"
+												arg-group="contact"
+												arg-set="{$user.Profile.custom_fields}"
+												arg-additionalFilters="{{ ['message'] }}"
+												arg-valueClass="pairs pairs--justified"
+											/>
+										</xf:if>
+									</xf:if> 
+									
+									
+								</xf:contentcheck>
+							</div>
+						<xf:if is="property('collapseExtraInfo')">
+							
+							<div class="thThreads__userExtra--toggle">
+								<span class="thThreads__userExtra--trigger" data-xf-click="ththreads-userextra-trigger"></span>
+							</div>
+						</xf:if>
+				</xf:if>
+			</xf:if>
+		</div> 
+		
+		
+		
+		
+		
+		
+		
+		<span class="message-userArrow"></span>
+	</section>
+	<xf:js>
+$(function()
+		{
+    $('.message-user').on('mouseenter', function(){
+        $(this).find('.message-userExtras').slideDown('show');
+    });
+    
+    $('.message-user').on('mouseleave', function(){
+        $(this).find('.message-userExtras').slideUp('normal');
+    });
+  });
+
+    </xf:js>
+</xf:macro>
+
+<xf:macro name="user_info_simple" arg-user="!" arg-fallbackName="">
+	<header itemscope itemtype="https://schema.org/Person" class="message-user">
+		<meta itemprop="name" content="{{ $user.username ?: $fallbackName }}">
+		<div class="message-avatar">
+			<div class="message-avatar-wrapper">
+				<xf:avatar user="$user" size="s" defaultname="{$fallbackName}" itemprop="image" />
+			</div>
+		</div>
+		<span class="message-userArrow"></span>
+	</header>
+</xf:macro>
+
+<xf:macro name="attachments" arg-attachments="!" arg-message="!" arg-canView="!">
+	<xf:if contentcheck="true">
+		<xf:css src="attachments.less" />
+		<section class="message-attachments">
+			<h4 class="block-textHeader">{{ phrase('attachments') }}</h4>
+			<ul class="attachmentList">
+				<xf:contentcheck>
+					<xf:foreach loop="$attachments" value="$attachment" if="!$message.isAttachmentEmbedded($attachment)">
+						<xf:macro template="attachment_macros" name="attachment_list_item"
+							arg-attachment="{$attachment}"
+							arg-canView="{$canView}" />
+					</xf:foreach>
+				</xf:contentcheck>
+			</ul>
+		</section>
+	</xf:if>
+</xf:macro>
+
+
+<xf:macro name="signature" arg-user="!">
+	<xf:if is="$xf.visitor.Option.content_show_signature AND $user.Profile.signature">
+		<xf:if contentcheck="true">
+			  <div class="Sign-Block">
+                 <h6><i class="fas fa-user-edit" style="color: rgb(29, 24, 184);font-size: 22px;"></i> <span style="color:#2980b9"><span style="font-size:20px">توقيعى :</span></span><b>
+                     <span style="color:#FF2BDF"><b>
+                         <xf:username user="$user" /></b></span></b>
+                </h6>
+                <aside class="Sign-Content">
+                     <xf:contentcheck>
+                         {{ bb_code($user.Profile.signature, 'user:signature', $user) }}
+                        </xf:contentcheck>
+                </aside>
+
+            </div> 
+		</xf:if>
+	</xf:if>
+</xf:macro>]]></template>
+    <template title="post_macros" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[<xf:macro name="post"
+	arg-post="!"
+	arg-thread="!"
+	arg-highlightedPosts="{{ [] }}">
+
+	<xf:css src="message.less" />
+
+	<xf:extension name="before"></xf:extension>
+
+	<xf:extension name="extra_classes" value="message--post" />
+	<article class="message {{ extension_value('extra_classes') }} js-post js-inlineModContainer {{ $post.isIgnored() ? 'is-ignored' : '' }} {{ $post.isUnread() ? ' is-unread' : '' }}"
+		data-author="{{ $post.User.username ?: $post.username }}"
+		data-content="post-{$post.post_id}"
+		id="js-post-{$post.post_id}">
+
+		<span class="u-anchorTarget" id="post-{$post.post_id}"></span>
+
+		<xf:extension name="full_body">
+			<div class="message-inner">
+				<xf:extension name="user_cell">
+					<div class="message-cell message-cell--user">
+						<xf:macro template="message_macros" name="user_info" arg-user="{$post.User}"
+							arg-fallbackName="{$post.username}"/>
+					</div>
+				</xf:extension>
+
+				<xf:extension name="main_cell">
+					<div class="message-cell message-cell--main">
+					<xf:extension name="main_cell_inner">
+						<div class="message-main js-quickEditTarget">
+
+							<xf:extension name="attribution">
+								<xf:macro name="post_attribution" arg-post="{$post}" arg-thread="{$thread}" />
+							</xf:extension>
+
+							<div class="message-content js-messageContent">
+							<xf:extension name="content">
+
+								<xf:extension name="notices">
+									<xf:macro name="post_notices" arg-post="{$post}" arg-thread="{$thread}" />
+								</xf:extension>
+
+								<xf:extension name="user_content">
+									<xf:macro name="post_user_content" arg-post="{$post}" arg-thread="{$thread}" />
+								</xf:extension>
+
+								<xf:extension name="after_content">
+									<xf:macro name="post_last_edit" arg-post="{$post}" />
+								</xf:extension>
+
+								<xf:extension name="signature">
+									<xf:macro template="message_macros" name="signature" arg-user="{$post.User}" />
+								</xf:extension>
+
+							</xf:extension>
+							</div>
+
+							<xf:extension name="footer">
+								<xf:macro name="post_footer" arg-post="{$post}" arg-thread="{$thread}" />
+							</xf:extension>
+						</div>
+
+					</xf:extension>
+					</div>
+				</xf:extension>
+			</div>
+		</xf:extension>
+	</article>
+
+	<xf:extension name="after"></xf:extension>
+	<xf:ad position="post_below_container" arg-post="{$post}" />
+</xf:macro>
+
+<xf:macro name="post_attribution"
+	arg-post="!"
+	arg-thread="!"
+	arg-showPosition="{{ true }}"
+	arg-showUser="{{ false }}"
+	arg-showThreadUnreadIndicator="{{ false }}"
+	arg-showReplyCount="{{ false }}"
+	arg-repliesPhrase="{{ phrase('replies:') }}"
+	arg-showThreadStateIcons="{{ false }}"
+	arg-mainClass=""
+	arg-oppositeClass="">
+
+	<header class="message-attribution message-attribution--split">
+		<ul class="message-attribution-main listInline {$mainClass}">
+			<xf:if is="$showThreadStateIcons">
+				<xf:if is="{$xf.visitor.user_id} AND {$thread.Watch.{$xf.visitor.user_id}}">
+					<li>
+						<xf:fa icon="fa-bell" title="{{ phrase('thread_watched')|for_attr }}" />
+						<span class="u-srOnly">{{ phrase('thread_watched') }}</span>
+					</li>
+				</xf:if>
+
+				<xf:if is="$thread.sticky">
+					<li>
+						<xf:fa icon="fa-thumbtack" title="{{ phrase('sticky')|for_attr }}" />
+						<span class="u-srOnly">{{ phrase('sticky') }}</span>
+					</li>
+				</xf:if>
+			</xf:if>
+			<xf:if is="$showUser">
+				<xf:set var="$username"><xf:username user="{$post.User}" defaultname="{$post.username}" /></xf:set>
+				<li class="u-concealed message-attribution-user--top">{{ phrase('by_user_x', {'name':$username}) }}</li>
+			</xf:if>
+			<li class="u-concealed">
+				<a href="{{ link('threads/post', $thread, {'post_id': $post.post_id}) }}" rel="nofollow">
+					<xf:date time="{$post.post_date}" itemprop="datePublished" />
+				</a>
+			</li>
+			<xf:if is="$showReplyCount && $thread.reply_count">
+				<li class="u-concealed">
+					<a href="{{ link('threads', $thread) }}#posts">
+						<xf:fa icon="fa-comment" class="u-spaceAfter" />{$repliesPhrase|raw} {$thread.reply_count|number}
+					</a>
+				</li>
+			</xf:if>
+		</ul>
+
+		<ul class="message-attribution-opposite message-attribution-opposite--list {$oppositeClass}">
+			<xf:if is="$post.isUnread()">
+				<li><span class="message-newIndicator">{{ phrase('new') }}</span></li>
+			<xf:elseif is="$thread.isUnread() && $showThreadUnreadIndicator" />
+				<li><span class="message-newIndicator" title="{{ phrase('new_replies')|for_attr }}">{{ phrase('new') }}</span></li>
+			</xf:if>
+			<li>
+				<a href="{{ link('threads/post', $thread, {'post_id': $post.post_id}) }}"
+					class="message-attribution-gadget"
+					data-xf-init="share-tooltip"
+					data-href="{{ link('posts/share', $post) }}"
+					aria-label="{{ phrase('share')|for_attr }}"
+					rel="nofollow">
+					<xf:fa icon="fa-share-alt"/>
+				</a>
+			</li>
+			<xf:if contentcheck="true">
+				<li>
+					<xf:contentcheck>
+						<xf:macro template="bookmark_macros" name="link"
+							arg-content="{$post}"
+							arg-class="message-attribution-gadget bookmarkLink--highlightable"
+							arg-confirmUrl="{{ link('posts/bookmark', $post) }}"
+							arg-showText="{{ false }}"/>
+					</xf:contentcheck>
+				</li>
+			</xf:if>
+			<xf:if is="$showPosition">
+				<li>
+					<a href="{{ link('threads/post', $thread, {'post_id': $post.post_id}) }}" rel="nofollow">
+						#{{ number($post.position + 1) }}
+					</a>
+				</li>
+			</xf:if>
+		</ul>
+	</header>
+</xf:macro>
+
+<xf:macro name="post_notices" arg-post="!" arg-thread="!">
+	<xf:if is="$post.message_state == 'deleted'">
+		<div class="messageNotice messageNotice--deleted">
+			<xf:macro template="deletion_macros" name="notice" arg-log="{$post.DeletionLog}" />
+		</div>
+	<xf:elseif is="$post.message_state == 'moderated'" />
+		<div class="messageNotice messageNotice--moderated">
+			{{ phrase('this_message_is_awaiting_moderator_approval_and_is_invisible_to_normal') }}
+		</div>
+	</xf:if>
+	<xf:if is="$post.warning_message">
+		<div class="messageNotice messageNotice--warning">
+			{$post.warning_message}
+		</div>
+	</xf:if>
+	<xf:if is="$post.isIgnored()">
+		<div class="messageNotice messageNotice--ignored">
+			{{ phrase('you_are_ignoring_content_by_this_member') }}
+			<xf:showignored />
+		</div>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="post_user_content" arg-post="!" arg-thread="!" arg-snippet="{{ false }}" arg-displayAds="{{ true }}">
+
+	<div class="message-userContent lbContainer js-lbContainer {{ $post.isIgnored() ? 'is-ignored' : '' }}"
+		data-lb-id="post-{$post.post_id}"
+		data-lb-caption-desc="{{ $post.User ? $post.User.username : $post.username }} &middot; {{ date_time($post.post_date) }}">
+
+		<xf:if is="$post.isFirstPost()">
+			<xf:macro template="custom_fields_macros" name="custom_fields_view"
+				arg-type="threads"
+				arg-group="before"
+				arg-onlyInclude="{$thread.Forum.field_cache}"
+				arg-set="{$thread.custom_fields}"
+				arg-wrapperClass="message-fields message-fields--before" />
+		</xf:if>
+
+		<article class="message-body js-selectToQuote">
+			<xf:if is="$displayAds">
+				<xf:ad position="post_above_content" arg-post="{$post}" />
+			</xf:if>
+			<xf:if is="$snippet">
+				{{ bb_code_snippet($post.message, 'post', $post, $snippet) }}
+			<xf:else />
+				{{ bb_code($post.message, 'post', $post) }}
+			</xf:if>
+			<div class="js-selectToQuoteEnd">&nbsp;</div>
+			<xf:if is="$displayAds">
+				<xf:ad position="post_below_content" arg-post="{$post}" />
+			</xf:if>
+		</article>
+
+		<xf:if is="$post.isFirstPost()">
+			<xf:macro template="custom_fields_macros" name="custom_fields_view"
+				arg-type="threads"
+				arg-group="after"
+				arg-onlyInclude="{$thread.Forum.field_cache}"
+				arg-set="{$thread.custom_fields}"
+				arg-wrapperClass="message-fields message-fields--after" />
+		</xf:if>
+
+		<xf:if is="$post.attach_count">
+			<xf:macro template="message_macros" name="attachments"
+				arg-attachments="{$post.Attachments}"
+				arg-message="{$post}"
+				arg-canView="{{ $thread.canViewAttachments() }}" />
+		</xf:if>
+	</div>
+</xf:macro>
+
+<xf:macro name="post_last_edit" arg-post="!">
+	<xf:if is="$post.last_edit_date">
+		<div class="message-lastEdit">
+			<xf:if is="$post.user_id == $post.last_edit_user_id">
+				{{ phrase('last_edited:') }} <xf:date time="{$post.last_edit_date}" itemprop="dateModified" />
+			<xf:else />
+				{{ phrase('last_edited_by_moderator:') }} <xf:date time="{$post.last_edit_date}" itemprop="dateModified" />
+			</xf:if>
+		</div>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="post_footer" arg-post="!" arg-thread="!">
+	 <xf:if is="$post->position == 0">            
+<div class="PrevNextThread" align="center">
+
+        اسم الموضوع : <a href="{{ link('threads' . (($thread.isUnread() AND !$forceRead) ? '/unread' : ''), $thread) }}" data-xf-init="tooltip" data-original-title="{$thread.title}">{$thread.title}</a>
+            |
+        المصدر : <a href="{{ link('forums', $thread.Forum) }}" data-xf-init="tooltip" data-original-title="{$thread.Forum.title}">{$thread.Forum.title}</a>
+        </div>
+</xf:if> 
+	<footer class="message-footer">
+		<xf:if contentcheck="true">
+			<div class="message-actionBar actionBar">
+				<xf:contentcheck>
+					<xf:macro name="post_action_bar" arg-post="{$post}" arg-thread="{$thread}" />
+				</xf:contentcheck>
+			</div>
+		</xf:if>
+
+		<div class="reactionsBar js-reactionsList {{ $post.reactions ? 'is-active' : '' }}">
+			<xf:reactions content="{$post}" link="posts/reactions" />
+		</div>
+
+		<div class="js-historyTarget message-historyTarget toggleTarget" data-href="trigger-href"></div>
+	</footer>
+</xf:macro>
+
+<xf:macro name="post_action_bar" arg-post="!" arg-thread="!">
+	<xf:if contentcheck="true">
+		<div class="actionBar-set actionBar-set--external">
+		<xf:contentcheck>
+			<xf:react content="{$post}" link="posts/react" list="< .js-post | .js-reactionsList" />
+
+			<xf:if is="$thread.canReply() OR $thread.canReplyPreReg()">
+				<xf:set var="$quoteLink">{{ link('threads/reply', $thread, {'quote': $post.post_id}) }}</xf:set>
+
+				<xf:if is="$xf.options.multiQuote AND $xf.visitor.user_id">
+					<a href="{$quoteLink}"
+						class="actionBar-action actionBar-action--mq u-jsOnly js-multiQuote"
+						title="{{ phrase('toggle_multi_quote_tooltip')|for_attr }}"
+						rel="nofollow"
+						data-message-id="{$post.post_id}"
+						data-mq-action="add">{{ phrase('quote') }}</a>
+				</xf:if>
+
+				<a href="{$quoteLink}"
+					class="actionBar-action actionBar-action--reply"
+					title="{{ phrase('reply_quoting_this_message')|for_attr }}"
+					rel="nofollow"
+					data-xf-click="quote"
+					data-quote-href="{{ link('posts/quote', $post) }}">{{ phrase('reply') }}</a>
+			</xf:if>
+		</xf:contentcheck>
+		</div>
+	</xf:if>
+
+	<xf:if contentcheck="true">
+		<div class="actionBar-set actionBar-set--internal">
+		<xf:contentcheck>
+			<xf:if is="$post.canUseInlineModeration()">
+				<span class="actionBar-action actionBar-action--inlineMod">
+					<xf:checkbox standalone="true">
+						<xf:option value="{$post.post_id}" class="js-inlineModToggle"
+							data-xf-init="tooltip"
+							title="{{ phrase('select_for_moderation') }}"
+							label="{{ phrase('select_for_moderation') }}"
+							hiddenlabel="true" />
+					</xf:checkbox>
+				</span>
+			</xf:if>
+
+			<xf:if is="$post.canReport()">
+				<a href="{{ link('posts/report', $post) }}"
+					class="actionBar-action actionBar-action--report"
+					data-xf-click="overlay">{{ phrase('report_verb') }}</a>
+			</xf:if>
+
+			<xf:set var="$hasActionBarMenu" value="{{ false }}" />
+			<xf:if is="$post.canEdit()">
+				<xf:js src="xf/message.js" min="1" />
+				<a href="{{ link('posts/edit', $post) }}"
+					class="actionBar-action actionBar-action--edit actionBar-action--menuItem"
+					data-xf-click="quick-edit"
+					data-editor-target="#js-post-{$post.post_id} .js-quickEditTarget"
+					data-menu-closer="true">{{ phrase('edit') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$post.edit_count && $post.canViewHistory()">
+				<a href="{{ link('posts/history', $post) }}"
+					class="actionBar-action actionBar-action--history actionBar-action--menuItem"
+					data-xf-click="toggle"
+					data-target="#js-post-{$post.post_id} .js-historyTarget"
+					data-menu-closer="true">{{ phrase('history') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$post.canDelete('soft')">
+				<a href="{{ link('posts/delete', $post) }}"
+					class="actionBar-action actionBar-action--delete actionBar-action--menuItem"
+					data-xf-click="overlay">{{ phrase('delete') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$post.message_state == 'deleted' AND $post.canUndelete()">
+				<a href="{{ link('posts/undelete', $post) }}"
+					class="actionBar-action actionBar-action--undelete actionBar-action--menuItem"
+					data-xf-click="overlay">{{ phrase('undelete') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$post.canCleanSpam()">
+				<a href="{{ link('spam-cleaner', $post) }}"
+					class="actionBar-action actionBar-action--spam actionBar-action--menuItem"
+					data-xf-click="overlay">{{ phrase('spam') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$xf.visitor.canViewIps() && $post.ip_id">
+				<a href="{{ link('posts/ip', $post) }}"
+					class="actionBar-action actionBar-action--ip actionBar-action--menuItem"
+					data-xf-click="overlay">{{ phrase('ip') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+			<xf:if is="$post.canWarn()">
+
+				<a href="{{ link('posts/warn', $post) }}"
+					class="actionBar-action actionBar-action--warn actionBar-action--menuItem">{{ phrase('warn') }}</a>
+
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			<xf:elseif is="$post.warning_id && $xf.visitor.canViewWarnings()" />
+				<a href="{{ link('warnings', {'warning_id': $post.warning_id}) }}"
+					class="actionBar-action actionBar-action--warn actionBar-action--menuItem"
+					data-xf-click="overlay">{{ phrase('view_warning') }}</a>
+				<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+			</xf:if>
+
+			<xf:if is="$hasActionBarMenu">
+				<a class="actionBar-action actionBar-action--menuTrigger"
+					data-xf-click="menu"
+					title="{{ phrase('more_options')|for_attr }}"
+					role="button"
+					tabindex="0"
+					aria-expanded="false"
+					aria-haspopup="true">&#8226;&#8226;&#8226;</a>
+
+				<div class="menu" data-menu="menu" aria-hidden="true" data-menu-builder="actionBar">
+					<div class="menu-content">
+						<h4 class="menu-header">{{ phrase('more_options') }}</h4>
+						<div class="js-menuBuilderTarget"></div>
+					</div>
+				</div>
+			</xf:if>
+		</xf:contentcheck>
+		</div>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="post_deleted" arg-post="!" arg-thread="!">
+	<xf:css src="message.less" />
+	<div class="message message--deleted message--post{{ $post.isIgnored() ? ' is-ignored' : '' }}{{ $post.isUnread() ? ' is-unread' : '' }} js-post js-inlineModContainer"
+		data-author="{{ $post.User.username ?: $post.username }}"
+		data-content="post-{$post.post_id}">
+
+		<span class="u-anchorTarget" id="post-{$post.post_id}"></span>
+		<div class="message-inner">
+			<div class="message-cell message-cell--user">
+				<xf:macro template="message_macros" name="user_info_simple" arg-user="{$post.User}" arg-fallbackName="{$post.username}" />
+			</div>
+			<div class="message-cell message-cell--main">
+				<div class="message-attribution">
+					<ul class="listInline listInline--bullet message-attribution-main">
+						<li><a href="{{ link('threads/post', $thread, {'post_id': $post.post_id}) }}" class="u-concealed" rel="nofollow"><xf:date time="{$post.post_date}" /></a></li>
+						<li><xf:username user="{$post.User}" defaultname="{$post.username}" class="u-concealed" /></li>
+					</ul>
+				</div>
+
+				<div class="messageNotice messageNotice--deleted">
+					<xf:macro template="deletion_macros" name="notice" arg-log="{$post.DeletionLog}" />
+
+					<a href="{{ link('posts/show', $post) }}" class="u-jsOnly" data-xf-click="inserter" data-replace="[data-content=post-{$post.post_id}]">{{ phrase('show...') }}</a>
+
+					<xf:if is="$post.canUseInlineModeration()">
+						<span style="display: none">
+							<!-- this can be actioned on the full post -->
+							<xf:checkbox standalone="true">
+								<xf:option value="{$post.post_id}" class="js-inlineModToggle"
+									hiddenlabel="true" />
+							</xf:checkbox>
+						</span>
+					</xf:if>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<xf:ad position="post_below_container" arg-post="{$post}" />
+</xf:macro>]]></template>
+    <template title="quick_reply_macros" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[<xf:macro name="body"
+	arg-message=""
+	arg-attachmentData="{{ null }}"
+	arg-forceHash=""
+	arg-messageSelector=""
+	arg-multiQuoteHref=""
+	arg-multiQuoteStorageKey=""
+	arg-simple="{{ false }}"
+	arg-submitText=""
+	arg-lastDate="0"
+	arg-lastKnownDate="0"
+	arg-loadExtra="{{ true }}"
+	arg-simpleSubmit="{{ false }}"
+	arg-minHeight="100"
+	arg-placeholder="{{ phrase('reply_placeholder') }}"
+	arg-deferred="{{ false }}"
+	arg-showGuestControls="{{ true }}"
+	arg-previewUrl="">
+
+	<xf:css src="message.less" />
+	<xf:set var="$sticky" value="{{ property('messageSticky') }}" />
+
+	<div class="message message--quickReply block-topRadiusContent block-bottomRadiusContent{{ $simple ? ' message--simple' : '' }}">
+		<div class="message-inner">
+			<div class="message-cell message-cell--user">
+				<div class="message-user {{ $sticky.user_info ? 'is-sticky' : '' }}">
+					<div class="message-avatar">
+						<div class="message-avatar-wrapper">
+							<xf:set var="$user" value="{{ $xf.visitor.user_id ? $xf.visitor : null }}" />
+							<xf:avatar user="$user" size="{{ $simple ? 's' : 'm' }}" defaultname="" />
+						</div>
+					</div>
+					<span class="message-userArrow"></span>
+				</div>
+			</div>
+			<div class="message-cell message-cell--main">
+				<div class="quick_info">
+                    *=== تذكر قول الله تعالى (( ما يلفظ من قول إلا لديه رقيب عتيد ))  ===*
+                </div>
+				<div class="message-editorWrapper">
+					<xf:set var="$editorHtml">
+						<xf:macro name="editor"
+							arg-message="{$message}"
+							arg-attachmentData="{$attachmentData}"
+							arg-forceHash="{$forceHash}"
+							arg-messageSelector="{$messageSelector}"
+							arg-multiQuoteHref="{$multiQuoteHref}"
+							arg-multiQuoteStorageKey="{$multiQuoteStorageKey}"
+							arg-minHeight="{$minHeight}"
+							arg-placeholder="{$placeholder}"
+							arg-submitText="{$submitText}"
+							arg-deferred="{$deferred}"
+							arg-lastDate="{$lastDate}"
+							arg-lastKnownDate="{$lastKnownDate}"
+							arg-loadExtra="{$loadExtra}"
+							arg-simpleSubmit="{$simpleSubmit}"
+							arg-showGuestControls="{$showGuestControls}"
+							arg-previewUrl="{$previewUrl}"
+						/>
+					</xf:set>
+
+					<xf:if is="$deferred">
+						<div class="editorPlaceholder" data-xf-click="editor-placeholder">
+							<div class="editorPlaceholder-editor is-hidden">{$editorHtml|raw}</div>
+							<div class="editorPlaceholder-placeholder">
+								<div class="input"><span class="u-muted"> {$placeholder}</span></div>
+							</div>
+						</div>
+					<xf:else />
+						{$editorHtml|raw}
+					</xf:if>
+				</div>
+			</div>
+		</div>
+	</div>
+</xf:macro>
+
+<xf:macro name="editor"
+	arg-message=""
+	arg-attachmentData="{{ null }}"
+	arg-forceHash=""
+	arg-messageSelector=""
+	arg-multiQuoteHref=""
+	arg-multiQuoteStorageKey=""
+	arg-minHeight="100"
+	arg-placeholder=""
+	arg-submitText=""
+	arg-deferred="{{ false }}"
+	arg-lastDate="0"
+	arg-lastKnownDate="0"
+	arg-loadExtra="{{ true }}"
+	arg-simpleSubmit="{{ false }}"
+	arg-showGuestControls="{{ true }}"
+	arg-previewUrl=""
+>
+	<xf:editor name="message"
+		value="{$message}"
+		attachments="{{ $attachmentData ? $attachmentData.attachments : [] }}"
+		data-min-height="{$minHeight}"
+		placeholder="{$placeholder}"
+		data-deferred="{{ $deferred ? 'on' : 'off' }}"
+		data-xf-key="{{ phrase('shortcut.quick_reply') }}"
+		data-preview-url="{$previewUrl}" />
+
+	<xf:if is="!$xf.visitor.user_id && $showGuestControls">
+		<xf:textboxrow name="_xfUsername" rowtype="fullWidth noGutter" data-xf-init="guest-username"
+			maxlength="{{ max_length($xf.visitor, 'username') }}"
+			label="{{ phrase('name') }}" />
+	</xf:if>
+	<xf:if is="$xf.visitor.isShownCaptcha()">
+		<div class="js-captchaContainer" data-row-type="fullWidth noGutter"></div>
+		<noscript><xf:hiddenval name="no_captcha" value="1" /></noscript>
+	</xf:if>
+
+	<xf:if is="$attachmentData">
+		<xf:macro template="helper_attach_upload" name="uploaded_files_list"
+			arg-attachments="{$attachmentData.attachments}"
+			arg-class="attachmentUploads--spaced" />
+	</xf:if>
+
+	<div class="formButtonGroup {{ $simpleSubmit ? 'formButtonGroup--simple' : '' }}">
+		<div class="formButtonGroup-primary">
+			<xf:button type="submit" class="button--primary" icon="reply">
+				{{ $submitText ?: phrase('post_reply') }}
+			</xf:button>
+		</div>
+		<xf:if contentcheck="true">
+			<div class="formButtonGroup-extra">
+				<xf:contentcheck>
+					<xf:if is="$attachmentData">
+						<xf:macro template="helper_attach_upload" name="upload_link_from_data"
+							arg-attachmentData="{$attachmentData}"
+							arg-forceHash="{$forceHash}" />
+					</xf:if>
+					<xf:if is="$xf.options.multiQuote && $multiQuoteHref">
+						<xf:macro template="multi_quote_macros" name="button"
+							arg-href="{$multiQuoteHref}"
+							arg-messageSelector="{$messageSelector}"
+							arg-storageKey="{$multiQuoteStorageKey}" />
+					</xf:if>
+				</xf:contentcheck>
+			</div>
+		</xf:if>
+		<xf:hiddenval name="last_date" autocomplete="off">{$lastDate}</xf:hiddenval>
+		<xf:hiddenval name="last_known_date" autocomplete="off">{$lastKnownDate}</xf:hiddenval>
+		<xf:hiddenval name="load_extra">{{ $loadExtra ? 1 : 0 }}</xf:hiddenval>
+	</div>
+</xf:macro>]]></template>
+    <template title="share_controls.less" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[.shareButtons
+{
+	.m-clearFix();
+}
+
+.shareButtons-buttons
+{
+	.shareButtons--iconic &
+	{
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+	}
+}
+
+.shareButtons-label
+{
+	float: left;
+	margin-right: 3px;
+	color: @xf-textColorMuted;
+	min-height: 35px;
+	line-height: 35px;
+}
+
+.shareButtons-button
+{
+	float: left;
+	margin-right: 3px;
+	padding: 6px;
+	color: @xf-textColorMuted;
+	font-size: 20px;
+	line-height: 20px;
+	white-space: nowrap;
+	min-width: 35px;
+	border-radius: @xf-borderRadiusSmall;
+	background-color: transparent;
+	.m-transition();
+
+	&:last-of-type
+	{
+		margin-right: 0;
+	}
+
+	&:hover
+	{
+		text-decoration: none;
+		color: white;
+	}
+
+	> i
+	{
+		display: inline-block;
+		vertical-align: middle;
+
+		.m-faBase('Pro');
+	}
+
+	&.shareButtons-button--brand
+	{
+		> i
+		{
+			.m-faBase('Brands');
+		}
+	}
+
+	> span
+	{
+		font-weight: @xf-fontWeightNormal;
+		font-size: @xf-fontSizeNormal;
+	}
+
+	.shareButtons--iconic &
+	{
+		text-align: center;
+
+		> i
+		{
+			min-width: 20px;
+		}
+
+		> span
+		{
+			.m-visuallyHidden();
+		}
+	}
+
+	&.shareButtons-button--facebook
+	{
+		&:hover { background-color: #3B5998; }
+		> i:before { .m-faContent(@fa-var-facebook-f); }
+	}
+
+	&.shareButtons-button--twitter
+	{
+		&:hover { background-color: #1DA1F3; }
+		> i:before { .m-faContent(@fa-var-twitter); }
+	}
+
+	&.shareButtons-button--pinterest
+	{
+		&:hover { background-color: #bd081c; }
+		> i:before { .m-faContent(@fa-var-pinterest-p); }
+	}
+
+	&.shareButtons-button--tumblr
+	{
+		&:hover { background-color: #35465c; }
+		> i:before { .m-faContent(@fa-var-tumblr); }
+	}
+
+	&.shareButtons-button--reddit
+	{
+		&:hover { background-color: #FF4500; }
+		> i:before { .m-faContent(@fa-var-reddit-alien); }
+	}
+
+	&.shareButtons-button--whatsApp
+	{
+		&:hover { background-color: #25D366; }
+		> i:before { .m-faContent(@fa-var-whatsapp); }
+	}
+
+	&.shareButtons-button--email
+	{
+		&:hover { background-color: #1289ff; }
+		> i:before { .m-faContent(@fa-var-envelope); }
+	}
+
+	&.shareButtons-button--share
+	{
+		cursor: pointer;
+		&:hover { background-color: #787878; }
+		> i:before { .m-faContent(@fa-var-share-alt); }
+	}
+
+	&.shareButtons-button--link
+	{
+		cursor: pointer;
+		&:hover { background-color: #787878; }
+		> i:before { .m-faContent(@fa-var-link); }
+	}
+
+	&.is-hidden
+	{
+		display: none;
+	}
+}
+
+.shareInput
+{
+	margin-bottom: 5px;
+
+	&:last-child
+	{
+		margin-bottom: 0;
+	}
+}
+
+.shareInput-label
+{
+	font-size: @xf-fontSizeSmall;
+	.m-appendColon();
+}
+
+.shareInput-button
+{
+	color: @xf-linkColor;
+	cursor: pointer;
+
+	> i
+	{
+		display: inline-block;
+		vertical-align: middle;
+		.m-faBase();
+
+		&:before { .m-faContent(@fa-var-copy); }
+	}
+
+	&.is-hidden
+	{
+		display: none;
+	}
+}
+
+.shareInput-input
+{
+	font-size: @xf-fontSizeSmall;
+
+	.m-inputZoomFix();
+
+	.shareInput-button.is-hidden + &
+	{
+		border-radius: @xf-borderRadiusMedium;
+	}
+}
+
+.shareButtons-button {
+    .xf-xenarabiaSharingButtons();
+    
+    &.shareButtons-button--telegram
+    {
+        &:hover { background-color: #259bd8; }
+        > i:before { .m-faContent(@fa-var-telegram); }
+    }
+
+    &.shareButtons-button--vk
+    {
+        &:hover { background-color: #4d75a3; }
+        > i:before { .m-faContent(@fa-var-vk); }
+    }
+
+    &.shareButtons-button--ok
+    {
+        &:hover { background-color: #e67e17; }
+        > i:before { .m-faContent(@fa-var-odnoklassniki); }
+    }
+
+    &.shareButtons-button--blogger
+    {
+        &:hover { background-color: #f79138; }
+        > i:before { .m-faContent(@fa-var-blogger); }
+    }
+
+    &.shareButtons-button--linkedin
+    {
+        &:hover { background-color: #283e4a; }
+        > i:before { .m-faContent(@fa-var-linkedin); }
+    }
+
+    &.shareButtons-button--diaspora
+    {
+        &:hover { background-color: #750000; }
+        > i:before { .m-faContent(@fa-var-diaspora); }
+    }
+
+    &.shareButtons-button--viber
+    {
+        &:hover { background-color: #665cac; }
+        > i:before { .m-faContent(@fa-var-viber); }
+    }
+
+    &.shareButtons-button--skype
+    {
+        &:hover { background-color: #0078d7; }
+        > i:before { .m-faContent(@fa-var-skype); }
+    }
+
+    &.shareButtons-button--gmail
+    {
+        &:hover { background-color: #b23121; }
+        > i:before { .m-faContent(@fa-var-google); }
+    }
+
+    &.shareButtons-button--yahoomail
+    {
+        &:hover { background-color: #430297; }
+        > i:before { .m-faContent(@fa-var-yahoo); }
+    }
+
+    &.shareButtons-button--evernote
+    {
+        &:hover { background-color: #FF5E8F; }
+        > i:before { .m-faContent(@fa-var-evernote); }
+    }
+
+    &.shareButtons-button--xing
+    {
+        &:hover { background-color: #026466; }
+        > i:before { .m-faContent(@fa-var-xing); }
+    }
+
+    &.shareButtons-button--weibo
+    {
+        &:hover { background-color: #DF2029; }
+        > i:before { .m-faContent(@fa-var-weibo); }
+    }
+}]]></template>
+    <template title="share_page_macros" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[<xf:macro name="buttons"
+	arg-iconic="{{ false }}"
+	arg-hideLink="{{ false }}"
+	arg-label=""
+	arg-pageUrl=""
+	arg-pageTitle=""
+	arg-pageDesc=""
+	arg-pageImage="">
+
+	<xf:if contentcheck="true">
+		<xf:css src="share_controls.less" />
+
+		<div class="shareButtons {{ $iconic ? 'shareButtons--iconic' : '' }}" data-xf-init="share-buttons" data-page-url="{$pageUrl}" data-page-title="{$pageTitle}" data-page-desc="{$pageDesc}" data-page-image="{$pageImage}">
+			<xf:if is="$label is not empty">
+				<span class="shareButtons-label">{$label}</span>
+			</xf:if>
+
+			<div class="shareButtons-buttons">
+				<xf:contentcheck>
+					<xf:if is="$xf.options.facebookLike">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--facebook" data-href="https://www.facebook.com/sharer.php?u={url}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('facebook') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.tweet.enabled">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--twitter" data-href="https://twitter.com/intent/tweet?url={url}&amp;text={title}{{ $xf.options.tweet.via ? '&amp;via=' . $xf.options.tweet.via : '' }}{{ $xf.options.tweet.related ? '&amp;related=' . $xf.options.tweet.related : '' }}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('twitter') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.redditShare">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--reddit" data-href="https://reddit.com/submit?url={url}&amp;title={title}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('reddit') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.pinterestShare">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--pinterest" data-href="https://pinterest.com/pin/create/bookmarklet/?url={url}&amp;description={title}&amp;media={image}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('pinterest') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.tumblrShare">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--tumblr" data-href="https://www.tumblr.com/widgets/share/tool?canonicalUrl={url}&amp;title={title}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('tumblr') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.whatsAppShare">
+						<a class="shareButtons-button shareButtons-button--brand shareButtons-button--whatsApp" data-href="https://api.whatsapp.com/send?text={title}&nbsp;{url}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('whatsapp') }}</span>
+						</a>
+						 <a class="shareButtons-button shareButtons-button--brand shareButtons-button--vk" data-href="https://vk.com/share.php?url={url}&title={title}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('vk') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--ok" data-href="https://connect.ok.ru/dk?st.cmd=WidgetSharePreview&st.shareUrl={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('ok') }}</span>
+        </a>   
+
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--blogger" data-href="https://www.blogger.com/blog-this.g?u={url}&n={title}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('blogger') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--linkedin" data-href="https://www.linkedin.com/shareArticle?mini=true&url={url}&title={title}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('linkedin') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--diaspora" data-href="https://share.diasporafoundation.org/?title={title}&url={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('diaspora') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--weibo" data-href="http://service.weibo.com/share/share.php?url={url}&appkey=&title={title}&pic=&ralateUid=">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('weibo') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--telegram" data-href="https://t.me/share/url?url={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('telegram') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--viber" id="viber_share">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('viber') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--skype" data-href="https://web.skype.com/share?url={url}&text={title}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('skype') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--gmail" data-href="https://mail.google.com/mail/?view=cm&su={title}&body={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('google') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--yahoomail" data-href="http://compose.mail.yahoo.com/?to={url}&subject={title}&body={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('con_acc.yahoo') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--evernote" data-href="http://www.evernote.com/clip.action?url={url}&title={title}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('evernote') }}</span>
+        </a>
+    
+        <a class="shareButtons-button shareButtons-button--brand shareButtons-button--xing" data-href="https://www.xing.com/spi/shares/new?url={url}">
+            <i aria-hidden="true"></i>
+            <span>{{ phrase('xing') }}</span>
+        </a>
+					</xf:if>
+
+					<xf:if is="$xf.options.emailShare">
+						<a class="shareButtons-button shareButtons-button--email" data-href="mailto:?subject={title}&amp;body={url}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('email') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.webShare">
+						<a class="shareButtons-button shareButtons-button--share is-hidden"
+							data-xf-init="web-share"
+							data-title="{$pageTitle}" data-text="{$pageDesc}" data-url="{$pageUrl}"
+							data-hide=".shareButtons-button:not(.shareButtons-button--share)">
+
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('share') }}</span>
+						</a>
+					</xf:if>
+
+					<xf:if is="$xf.options.linkShare AND !$hideLink">
+						<a class="shareButtons-button shareButtons-button--link is-hidden" data-clipboard="{url}">
+							<i aria-hidden="true"></i>
+							<span>{{ phrase('link') }}</span>
+						</a>
+					</xf:if>
+				</xf:contentcheck>
+			</div>
+		</div>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="share_clipboard_input" arg-label="!" arg-text="!" arg-successText="">
+	<xf:css src="share_controls.less" />
+
+	<xf:set var="$id">{{ unique_id() }}</xf:set>
+
+	<div class="shareInput" data-xf-init="share-input" data-success-text="{$successText}">
+		<xf:if is="$label">
+			<label class="shareInput-label" for="{$id}">{$label}</label>
+		</xf:if>
+		<div class="inputGroup inputGroup--joined">
+			<div class="shareInput-button inputGroup-text js-shareButton is-hidden"
+				data-xf-init="tooltip" title="{{ phrase('copy_to_clipboard')|for_attr }}">
+
+				<i aria-hidden="true"></i>
+			</div>
+			<xf:textbox class="shareInput-input js-shareInput"
+				value="{$text}" readonly="true" id="{$id}" />
+		</div>
+	</div>
+</xf:macro>]]></template>
+    <template title="thread_list_macros" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[<xf:macro name="item"
+	arg-thread="!"
+	arg-forum=""
+	arg-forceRead="{{ false }}"
+	arg-showWatched="{{ true }}"
+	arg-allowInlineMod="{{ true }}"
+	arg-chooseName=""
+	arg-extraInfo=""
+	arg-allowEdit="{{ true }}">
+
+	<xf:css src="structured_list.less" />
+
+	<div class="structItem structItem--thread{{ $thread.prefix_id ? ' is-prefix' . $thread.prefix_id : '' }}{{ $thread.isIgnored() ? ' is-ignored' : '' }}{{ ($thread.isUnread() AND !$forceRead) ? ' is-unread' : '' }}{{ $thread.discussion_state == 'moderated' ? ' is-moderated' : '' }}{{ $thread.discussion_state == 'deleted' ? ' is-deleted' : '' }} js-inlineModContainer js-threadListItem-{$thread.thread_id}" data-author="{{ $thread.User.username ?: $thread.username }}">
+
+	<xf:extension name="icon_cell">
+		<div class="structItem-cell structItem-cell--icon">
+			<div class="structItem-iconContainer">
+				<xf:avatar user="$thread.User" size="s" defaultname="{$thread.username}" />
+				<xf:if is="$thread.getUserPostCount()">
+					<xf:avatar user="$xf.visitor" size="s"
+						href=""
+						class="avatar--separated structItem-secondaryIcon"
+						tabindex="0"
+						data-xf-init="tooltip"
+						data-trigger="auto"
+						title="{{ phrase('you_have_posted_x_messages_in_this_thread', {'count': $thread.getUserPostCount() }) }}" />
+				</xf:if>
+			</div>
+		</div>
+	</xf:extension>
+
+	<xf:extension name="main_cell">
+		<div class="structItem-cell structItem-cell--main" data-xf-init="touch-proxy">
+			<xf:if contentcheck="true">
+				<ul class="structItem-statuses">
+				<xf:contentcheck>
+				<xf:extension name="statuses">
+					<xf:if is="property('reactionSummaryOnLists') == 'status' && $thread.first_post_reactions">
+						<li><xf:reactions summary="true" reactions="{$thread.first_post_reactions}" /></li>
+					</xf:if>
+					<xf:extension name="before_status_state"></xf:extension>
+					<xf:if is="$thread.discussion_state == 'moderated'">
+						<li>
+							<xf:set var="$moderatedStatus">
+								<i class="structItem-status structItem-status--moderated" aria-hidden="true" title="{{ phrase('awaiting_approval')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('awaiting_approval') }}</span>
+							</xf:set>
+							<xf:if is="$thread.canCleanSpam()">
+								<a href="{{ link('spam-cleaner', $thread) }}" data-xf-click="overlay">{$moderatedStatus}</a>
+							<xf:else />
+								{$moderatedStatus}
+							</xf:if>
+						</li>
+					</xf:if>
+					<xf:if is="$thread.discussion_state == 'deleted'">
+						<li>
+							<i class="structItem-status structItem-status--deleted" aria-hidden="true" title="{{ phrase('deleted')|for_attr }}"></i>
+							<span class="u-srOnly">{{ phrase('deleted') }}</span>
+						</li>
+					</xf:if>
+					<xf:if is="!$thread.discussion_open">
+						<li>
+							<i class="structItem-status structItem-status--locked" aria-hidden="true" title="{{ phrase('locked')|for_attr }}"></i>
+							<span class="u-srOnly">{{ phrase('locked') }}</span>
+						</li>
+					</xf:if>
+
+					<xf:extension name="status_sticky">
+						<xf:if is="$thread.sticky">
+							<li>
+								<i class="structItem-status structItem-status--sticky" aria-hidden="true" title="{{ phrase('sticky')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('sticky') }}</span>
+							</li>
+						</xf:if>
+					</xf:extension>
+
+					<xf:extension name="before_status_watch"></xf:extension>
+					<xf:if is="{$showWatched} AND {$xf.visitor.user_id}">
+						<xf:if is="{$thread.Watch.{$xf.visitor.user_id}}">
+							<li>
+								<i class="structItem-status structItem-status--watched" aria-hidden="true" title="{{ phrase('thread_watched')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('thread_watched') }}</span>
+							</li>
+							<xf:elseif is="!$forum AND {$thread.Forum.Watch.{$xf.visitor.user_id}}" />
+							<li>
+								<i class="structItem-status structItem-status--watched" aria-hidden="true" title="{{ phrase('forum_watched')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('forum_watched') }}</span>
+							</li>
+						</xf:if>
+					</xf:if>
+
+					<xf:extension name="before_status_type"></xf:extension>
+					<xf:if is="$thread.discussion_type == 'redirect'">
+						<xf:extension name="thread_type_redirect">
+							<li>
+								<i class="structItem-status structItem-status--redirect" aria-hidden="true" title="{{ phrase('redirect')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('redirect') }}</span>
+							</li>
+						</xf:extension>
+					<xf:elseif is="$thread.discussion_type == 'question' && $thread.type_data.solution_post_id" />
+						<xf:extension name="thread_type_question_solved">
+							<li>
+								<i class="structItem-status structItem-status--solved" aria-hidden="true" title="{{ phrase('solved')|for_attr }}"></i>
+								<span class="u-srOnly">{{ phrase('solved') }}</span>
+							</li>
+						</xf:extension>
+					<xf:elseif is="!$forum || $forum.forum_type_id == 'discussion'" />
+						<xf:extension name="thread_type_icon">
+							<xf:if is="$thread.discussion_type != 'discussion'">
+								<xf:set var="$threadTypeHandler" value="{{ $thread.getTypeHandler() }}" />
+								<xf:if is="$threadTypeHandler.getTypeIconClass()">
+									<li>
+										<xf:set var="$threadTypePhrase" value="{{ $threadTypeHandler.getTypeTitle() }}" />
+										<xf:fa class="structItem-status" icon="{{ $threadTypeHandler.getTypeIconClass() }}" title="{$threadTypePhrase|for_attr}" />
+										<span class="u-srOnly">{$threadTypePhrase}</span>
+									</li>
+								</xf:if>
+							</xf:if>
+						</xf:extension>
+					</xf:if>
+				</xf:extension>
+				</xf:contentcheck>
+				</ul>
+			</xf:if>
+
+			<div class="structItem-title">
+				<xf:set var="$canPreview" value="{{ $thread.canPreview() }}" />
+				<xf:if is="$thread.sticky"><span style="color: #ff0000">{{ phrase('sticky') }}</span></xf:if> 
+				<xf:if is="$thread.prefix_id">
+					<xf:if is="$forum">
+						<a href="{{ link('forums', $forum, {'prefix_id': $thread.prefix_id}) }}" class="labelLink" rel="nofollow">{{ prefix('thread', $thread, 'html', '') }}</a>
+					<xf:else />
+						{{ prefix('thread', $thread, 'html', '') }}
+					</xf:if>
+				</xf:if>
+				<a href="{{ link('threads' . (($thread.isUnread() AND !$forceRead) ? '/unread' : ''), $thread) }}" class="" data-tp-primary="on" data-xf-init="{{ $canPreview ? 'preview-tooltip' : '' }}" data-preview-url="{{ $canPreview ? link('threads/preview', $thread) : '' }}">{$thread.title}</a>
+			</div>
+
+			<div class="structItem-minor">
+				<xf:if contentcheck="true">
+					<ul class="structItem-extraInfo">
+					<xf:contentcheck>
+						<xf:if is="property('reactionSummaryOnLists') == 'minor_opposite' && $thread.first_post_reactions">
+							<li><xf:reactions summary="true" reactions="{$thread.first_post_reactions}" /></li>
+						</xf:if>
+						<xf:if is="{$extraInfo}">
+							<li>{$extraInfo}</li>
+						<xf:elseif is="$allowEdit AND $thread.canEdit() AND $thread.canUseInlineModeration()" />
+							<xf:if is="!$allowInlineMod OR !$forum">
+								<xf:set var="$editParams" value="{{ {
+									'_xfNoInlineMod': !$allowInlineMod ? 1 : null,
+									 '_xfForumName': !$forum ? 1 : 0
+								} }}" />
+							<xf:else />
+								<xf:set var="$editParams" value="{{ [] }}" />
+							</xf:if>
+							<xf:if is="$thread.discussion_type != 'redirect'">
+								<li class="structItem-extraInfoMinor">
+									<a href="{{ link('threads/edit', $thread) }}" data-xf-click="overlay" data-cache="false" data-href="{{ link('threads/edit', $thread, $editParams) }}">
+										{{ phrase('edit') }}
+									</a>
+								</li>
+							</xf:if>
+						</xf:if>
+						<xf:if is="$chooseName">
+							<li><xf:checkbox standalone="true">
+								<xf:option name="{$chooseName}[]" value="{$thread.thread_id}" class="js-chooseItem" />
+							</xf:checkbox></li>
+						<xf:elseif is="$allowInlineMod AND $thread.canUseInlineModeration()" />
+							<li><xf:checkbox standalone="true">
+								<xf:option value="{$thread.thread_id}" class="js-inlineModToggle"
+									data-xf-init="tooltip"
+									title="{{ phrase('select_for_moderation') }}"
+									label="{{ phrase('select_for_moderation') }}"
+									hiddenlabel="true"
+								/>
+							</xf:checkbox></li>
+						</xf:if>
+					</xf:contentcheck>
+					</ul>
+				</xf:if>
+
+				<xf:if is="$thread.discussion_state == 'deleted'">
+					<xf:if is="{$extraInfo}"><span class="structItem-extraInfo">{$extraInfo}</span></xf:if>
+
+					<xf:macro template="deletion_macros" name="notice" arg-log="{$thread.DeletionLog}" />
+				<xf:else />
+					<ul class="structItem-parts">
+						<li><xf:username user="$thread.User" defaultname="{$thread.username}" /></li>
+						<li class="structItem-startDate"><a href="{{ link('threads', $thread) }}" rel="nofollow"><xf:date time="{$thread.post_date}" /></a></li>
+						<xf:if is="!$forum">
+							<li><a href="{{ link('forums', $thread.Forum) }}">{$thread.Forum.title}</a></li>
+						</xf:if>
+					</ul>
+
+					<xf:if is="$thread.discussion_type != 'redirect' && $thread.reply_count >= $xf.options.messagesPerPage && $xf.options.lastPageLinks">
+						<span class="structItem-pageJump">
+						<xf:foreach loop="{{ last_pages($thread.reply_count + 1, $xf.options.messagesPerPage, $xf.options.lastPageLinks) }}" value="$p">
+							<a href="{{ link('threads', $thread, {'page': $p}) }}">{$p}</a>
+						</xf:foreach>
+						</span>
+					</xf:if>
+				</xf:if>
+			</div>
+		</div>
+	</xf:extension>
+
+	<xf:extension name="meta_cell">
+		<div class="structItem-cell structItem-cell--meta" title="{{ phrase('first_message_reaction_score:')|for_attr }} {$thread.first_post_reaction_score|number}">
+			<dl class="pairs pairs--justified">
+				<dt>{{ phrase('replies') }}</dt>
+				<dd>{{ $thread.discussion_type == 'redirect' ? '&ndash;' : $thread.reply_count|number_short }}</dd>
+			</dl>
+			<dl class="pairs pairs--justified structItem-minor">
+				<dt>{{ phrase('views') }}</dt>
+				<dd>{{ $thread.discussion_type == 'redirect' ? '&ndash;' : ($thread.view_count > $thread.reply_count ? $thread.view_count|number_short : number_short($thread.reply_count+1)) }}</dd>
+			</dl>
+		</div>
+	</xf:extension>
+
+	<xf:extension name="latest_cell">
+		<div class="structItem-cell structItem-cell--latest">
+			<xf:if is="$thread.discussion_type == 'redirect'">
+				{{ phrase('n_a') }}
+			<xf:else />
+				<a href="{{ link('threads/latest', $thread) }}" rel="nofollow"><xf:date time="{$thread.last_post_date}" class="structItem-latestDate" /></a>
+				<div class="structItem-minor">
+					<xf:if is="$xf.visitor.isIgnoring($thread.last_post_user_id)">
+						{{ phrase('ignored_member') }}
+					<xf:else />
+						<xf:username user="{$thread.LastPoster}" defaultname="{$thread.last_post_username}" />
+					</xf:if>
+				</div>
+			</xf:if>
+		</div>
+	</xf:extension>
+
+	<xf:extension name="icon_end_cell">
+		<div class="structItem-cell structItem-cell--icon structItem-cell--iconEnd">
+			<div class="structItem-iconContainer">
+				<xf:if is="$xf.visitor.isIgnoring($thread.last_post_user_id) OR $thread.discussion_type == 'redirect'">
+					<xf:avatar user="{{ null }}" size="xxs" />
+				<xf:else />
+					<xf:avatar user="{$thread.LastPoster}" defaultname="{$thread.last_post_username}" size="xxs" />
+				</xf:if>
+			</div>
+		</div>
+	</xf:extension>
+
+	</div>
+</xf:macro>
+
+<xf:macro name="item_new_posts" arg-thread="!">
+	<div class="contentRow">
+		<div class="contentRow-figure">
+			<xf:avatar user="$thread.LastPoster" size="xxs" defaultname="{$thread.last_post_username}" />
+		</div>
+		<div class="contentRow-main contentRow-main--close">
+			<xf:if is="$thread.isUnread()">
+				<a href="{{ link('threads/unread', $thread) }}">{{ prefix('thread', $thread) }}{$thread.title}</a>
+			<xf:else />
+				<a href="{{ link('threads/post', $thread, {'post_id': $thread.last_post_id}) }}">{{ prefix('thread', $thread) }}{$thread.title}</a>
+			</xf:if>
+
+			<div class="contentRow-minor contentRow-minor--hideLinks">
+				<ul class="listInline listInline--bullet">
+					<li>{{ phrase('latest_x', {'name': $thread.last_post_cache.username}) }}</li>
+					<li><xf:date time="{$thread.last_post_date}" /></li>
+				</ul>
+			</div>
+			<div class="contentRow-minor contentRow-minor--hideLinks">
+				<a href="{{ link('forums', $thread.Forum) }}">{$thread.Forum.title}</a>
+			</div>
+		</div>
+	</div>
+</xf:macro>
+
+<xf:macro name="item_new_threads" arg-thread="!">
+	<div class="contentRow">
+		<div class="contentRow-figure">
+			<xf:avatar user="$thread.User" size="xxs" defaultname="{$thread.username}" />
+		</div>
+		<div class="contentRow-main contentRow-main--close">
+			<a href="{{ link('threads', $thread) }}">{{ prefix('thread', $thread) }}{$thread.title}</a>
+
+			<div class="contentRow-minor contentRow-minor--hideLinks">
+				<ul class="listInline listInline--bullet">
+					<li>{{ phrase('started_by_x', {'name': $thread.username}) }}</li>
+					<li><xf:date time="{$thread.post_date}" /></li>
+					<li>{{ phrase('replies:') }} {$thread.reply_count|number_short}</li>
+				</ul>
+			</div>
+			<div class="contentRow-minor contentRow-minor--hideLinks">
+				<a href="{{ link('forums', $thread.Forum) }}">{$thread.Forum.title}</a>
+			</div>
+		</div>
+	</div>
+</xf:macro>
+
+<xf:macro name="quick_thread"
+	arg-forum="!"
+	arg-page="1"
+	arg-order="last_post_date"
+	arg-direction="desc"
+	arg-prefixes="{{ [] }}">
+
+	<xf:css src="structured_list.less" />
+
+	<xf:if is="$forum.canCreateThread() OR $forum.canCreateThreadPreReg()">
+
+		<xf:js src="xf/thread.js" min="1" />
+
+		<xf:set var="$inlineMode" value="{{ ($page == 1 && $order == 'last_post_date' && $direction == 'desc') ? true : false }}" />
+
+		<xf:form action="{{ link('forums/post-thread', $forum, {'inline-mode': $inlineMode}) }}" ajax="true"
+			class="structItem structItem--quickCreate"
+			draft="{{ link('forums/draft', $forum) }}"
+			data-xf-init="quick-thread"
+			data-focus-activate=".js-titleInput"
+			data-focus-activate-href="{{ link('forums/post-thread', $forum, {'inline-mode': true}) }}"
+			data-focus-activate-target=".js-quickThreadFields"
+			data-insert-target=".js-threadList"
+			data-replace-target=".js-emptyThreadList">
+
+		<xf:extension name="icon_cell">
+			<div class="structItem-cell structItem-cell--icon">
+				<div class="structItem-iconContainer">
+					<xf:avatar user="$xf.visitor" size="s" />
+				</div>
+			</div>
+		</xf:extension>
+
+		<xf:extension name="main_cell">
+			<div class="structItem-cell structItem-cell--newThread js-prefixListenContainer">
+
+				<xf:formrow rowtype="noGutter noLabel fullWidth noPadding mergeNext"
+					label="{{ phrase('title') }}">
+
+					<xf:prefixinput maxlength="{{ max_length('XF:Thread', 'title') }}"
+						placeholder="{$forum.thread_prompt}"
+						title="{{ phrase('post_new_thread_in_this_forum') }}"
+						prefix-value="{$forum.default_prefix_id}"
+						type="thread"
+						prefixes="{$prefixes}"
+						data-xf-init="tooltip"
+						rows="1"
+						help-href="{{ link('forums/prefix-help', $forum) }}"
+						help-skip-initial="{{ true }}" />
+
+					<!--[XF:qt_title_after]-->
+				</xf:formrow>
+
+				<div class="js-quickThreadFields inserter-container is-hidden"><!--{{ phrase('loading...') }}--></div>
+			</div>
+		</xf:extension>
+
+		</xf:form>
+	</xf:if>
+
+</xf:macro>]]></template>
+    <template title="thread_view" type="public" addon_id="XF" version_id="2020970" version_string="2.2.9"><![CDATA[<xf:title page="{$page}">{$thread.title}</xf:title>
+<xf:h1>{{ prfix('thread', $thread) }}{$thread.title}</xf:h1>
+<h3>{{ snippet($firstPost.message|strip_tags, 160, {'stripBbCode': true}) }}</h3>
+<xf:h1><a href="{{ link('threads', $thread) }}">{{ prefix('thread', $thread) }}{$thread.title}</a></xf:h1> 
+<xf:if is="!$thread.isSearchEngineIndexable()">
+	<xf:head option="metaNoindex"><meta name="robots" content="noindex" /></xf:head>
+</xf:if>
+
+<xf:description meta="false">
+	<ul class="listInline listInline--bullet">
+		<li>
+			<xf:fa icon="fa-user" title="{{ phrase('thread_starter')|for_attr }}" />
+			<span class="u-srOnly">{{ phrase('thread_starter') }}</span>
+
+			<xf:username user="{$thread.User}" defaultname="{$thread.username}" class="u-concealed" />
+		</li>
+		<li>
+			<xf:fa icon="fa-clock" title="{{ phrase('start_date')|for_attr }}" />
+			<span class="u-srOnly">{{ phrase('start_date') }}</span>
+
+			<a href="{{ link('threads', $thread) }}" class="u-concealed"><xf:date time="{$thread.post_date}" /></a>
+		</li>
+		<xf:if is="$xf.options.enableTagging AND ($thread.canEditTags() OR $thread.tags)">
+			<li>
+				<xf:macro template="tag_macros" name="list"
+					arg-tags="{$thread.tags}"
+					arg-tagList="tagList--thread-{$thread.thread_id}"
+					arg-editLink="{{ $thread.canEditTags() ? link('threads/tags', $thread) : '' }}" />
+			</li>
+		</xf:if>
+	</ul>
+</xf:description>
+
+<xf:set var="$fpSnippet" value="{{ snippet($firstPost.message, 0, {'stripBbCode': true}) }}" />
+
+<xf:macro template="metadata_macros" name="metadata"
+	arg-description="{$fpSnippet}"
+	arg-shareUrl="{{ link('canonical:threads', $thread) }}"
+	arg-canonicalUrl="{{ link('canonical:threads', $thread, {'page': $page}) }}" />
+
+<xf:page option="ldJsonHtml">
+	<xf:extension name="structured_data_extra_params" value="{{ [] }}" />
+	<xf:extension name="structured_data">
+		<xf:set var="$ldJson"
+			value="{{ $thread.getLdStructuredData($firstPost, $page, extension_value('structured_data_extra_params')) }}"
+		/>
+		<xf:if is="$ldJson">
+			<script type="application/ld+json">
+				{$ldJson|json(true)|raw}
+			</script>
+		</xf:if>
+	</xf:extension>
+</xf:page>
+
+<xf:extension name="content_top"></xf:extension>
+<!--[XF:content_top]-->
+
+<xf:if is="$pendingApproval">
+	<div class="blockMessage blockMessage--important">{{ phrase('content_submitted_displayed_pending_approval') }}</div>
+</xf:if>
+
+<xf:if is="$thread.prefix_id">
+	<xf:if contentcheck="true">
+		<div class="blockMessage blockMessage--alt blockMessage--small blockMessage--close">
+			<xf:contentcheck>{{ prefix_description('thread', $thread.prefix_id) }}</xf:contentcheck>
+		</div>
+	</xf:if>
+</xf:if>
+
+<xf:macro template="forum_macros" name="forum_page_options" arg-forum="{$forum}" arg-thread="{$thread}" />
+
+<xf:breadcrumb source="$forum.getBreadcrumbs()" />
+<xf:breadcrumb href="">{$thread.title}</xf:breadcrumb>
+<xf:button icon="prev" href="{{ link('forums', $thread.Forum) }}">أرجع للقسم</xf:button>
+
+<xf:if is="$canInlineMod OR $thread.canUseInlineModeration()">
+	<xf:js src="xf/inline_mod.js" min="1" />
+</xf:if>
+
+<xf:extension name="above_messages"></xf:extension>
+<xf:ad position="thread_view_above_messages" arg-thread="{$thread}" />
+<xf:widgetpos id="thread_view_above_messages" context-thread="{$thread}" />
+
+<xf:set var="$threadActionsHtml">
+	<xf:extension name="thread_actions">
+		<xf:if contentcheck="true">
+			<div class="block-outer-opposite">
+				<div class="buttonGroup">
+				<xf:contentcheck>
+					<xf:extension name="thread_action_buttons">
+						<xf:if is="$canInlineMod">
+							<xf:macro template="inline_mod_macros" name="button" />
+						</xf:if>
+						<xf:if is="$thread.discussion_state == 'deleted' AND $thread.canUndelete()">
+							<xf:button href="{{ link('threads/undelete', $thread) }}" class="button--link" overlay="true">
+								{{ phrase('undelete') }}
+							</xf:button>
+						</xf:if>
+						<xf:if is="$thread.canApproveUnapprove() AND $thread.discussion_state == 'moderated'">
+							<xf:button href="{{ link('threads/approve', $thread) }}" class="button--link" overlay="true">
+								{{ phrase('approve') }}
+							</xf:button>
+						</xf:if>
+						<xf:if is="$xf.visitor.user_id AND $thread.isUnread()">
+							<xf:button href="{{ ($firstUnread AND $isSimpleDateDisplay) ? ('#post-' . $firstUnread.post_id) : link('threads/unread', $thread, {'new': 1}) }}"
+								class="button--link"
+								data-xf-click="scroll-to"
+								data-silent="true">
+									{{ phrase('jump_to_new') }}
+							</xf:button>
+						</xf:if>
+						<xf:if is="$thread.canWatch()">
+							<xf:button href="{{ link('threads/watch', $thread) }}" class="button--link"
+								data-xf-click="switch-overlay"
+								data-sk-watch="{{ phrase('watch') }}"
+								data-sk-unwatch="{{ phrase('unwatch') }}">
+								<xf:if is="{$thread.Watch.{$xf.visitor.user_id}}">
+									{{ phrase('unwatch') }}
+								<xf:else />
+									{{ phrase('watch') }}
+								</xf:if>
+							</xf:button>
+						</xf:if>
+
+						<xf:if contentcheck="true">
+							<div class="buttonGroup-buttonWrapper">
+								<xf:button class="button--link menuTrigger" data-xf-click="menu" aria-expanded="false" aria-haspopup="true" title="{{ phrase('more_options') }}">&#8226;&#8226;&#8226;</xf:button>
+								<div class="menu" data-menu="menu" aria-hidden="true">
+									<div class="menu-content">
+										<h4 class="menu-header">{{ phrase('more_options') }}</h4>
+										<xf:contentcheck>
+											<!--[XF:thread_tools_menu:top]-->
+											<xf:if is="$thread.canEdit()">
+												<a href="{{ link('threads/edit', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('edit_thread') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canChangeType() AND count($creatableThreadTypes) > 1">
+												<a href="{{ link('threads/change-type', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('change_thread_type') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canLockUnlock()">
+												<a href="{{ link('threads/quick-close', $thread) }}"
+													class="menu-linkRow"
+													data-xf-click="switch"
+													data-menu-closer="true">
+
+													<xf:if is="$thread.discussion_open">
+														{{ phrase('lock_thread') }}
+													<xf:else />
+														{{ phrase('unlock_thread') }}
+													</xf:if>
+												</a>
+											</xf:if>
+											<xf:if is="$thread.canStickUnstick()">
+												<a href="{{ link('threads/quick-stick', $thread) }}"
+													class="menu-linkRow"
+													data-xf-click="switch"
+													data-menu-closer="true">
+
+													<xf:if is="$thread.sticky">
+														{{ phrase('unstick_thread') }}
+													<xf:else />
+														{{ phrase('stick_thread') }}
+													</xf:if>
+												</a>
+											</xf:if>
+											<xf:if is="$thread.canCreatePoll()">
+												<a href="{{ link('threads/poll/create', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('create_poll') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canDelete('soft')">
+												<a href="{{ link('threads/delete', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('delete_thread') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canMove()">
+												<a href="{{ link('threads/move', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('move_thread') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canReplyBan()">
+												<a href="{{ link('threads/reply-bans', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('manage_reply_bans') }}</a>
+											</xf:if>
+											<xf:if is="$thread.canViewModeratorLogs()">
+												<a href="{{ link('threads/moderator-actions', $thread) }}" data-xf-click="overlay" class="menu-linkRow">{{ phrase('moderator_actions') }}</a>
+											</xf:if>
+											<!--[XF:thread_tools_menu:before_footer]-->
+											<xf:if is="$thread.canUseInlineModeration()">
+												<div class="menu-footer"
+													data-xf-init="inline-mod"
+													data-type="thread"
+													data-href="{{ link('inline-mod') }}"
+													data-toggle=".js-threadInlineModToggle">
+													<xf:checkbox>
+														<xf:option class="js-threadInlineModToggle" value="{$thread.thread_id}">{{ phrase('select_for_moderation') }}</xf:option>
+													</xf:checkbox>
+												</div>
+											</xf:if>
+											<!--[XF:thread_tools_menu:bottom]-->
+										</xf:contentcheck>
+									</div>
+								</div>
+							</div>
+						</xf:if>
+					</xf:extension>
+				</xf:contentcheck>
+				</div>
+			</div>
+		</xf:if>
+	</xf:extension>
+</xf:set>
+
+<xf:set var="$postSortFilterHtml">
+	<xf:extension name="post_sort_filter">
+		<xf:if is="($posts is not empty OR $filters)">
+			<xf:if contentcheck="true">
+				<div class="tabs tabs--standalone tabs--standalone--small tabs--standalone--inline">
+				<xf:contentcheck>
+					<xf:if is="$availableSorts AND count($availableSorts) > 1">
+						<xf:foreach loop="$availableSorts" key="$sortKey" value="$null">
+							<a href="{{ link('threads', $thread, $pageNavFilters|replace({'order': $sortKey == $defaultOrder ? null : $sortKey})) }}"
+								class="tabs-tab {{ $sortKey == $effectiveOrder ? 'is-active' : '' }}"
+								rel="nofollow">
+								{{ phrase_dynamic('thread_sort.' . $sortKey) }}
+							</a>
+						</xf:foreach>
+					</xf:if>
+					<xf:extension name="post_sort_filter_end"></xf:extension>
+				</xf:contentcheck>
+				</div>
+			</xf:if>
+		</xf:if>
+	</xf:extension>
+</xf:set>
+
+<xf:if is="$isFirstPostPinned">
+	<xf:extension name="pinned_block_before"></xf:extension>
+
+	<xf:extension name="pinned_block_classes" value="" />
+	<div class="block block--messages {{ extension_value('pinned_block_classes') }}"
+		data-xf-init="lightbox{{ $xf.options.selectQuotable ? ' select-to-quote' : '' }}"
+		data-message-selector=".js-post"
+		data-lb-id="thread-{$thread.thread_id}">
+		<xf:extension name="pinned_outer_before">
+			<xf:macro name="thread_status" arg-thread="{$thread}" arg-wrapperClass="block-outer" />
+
+			<div class="block-outer"><xf:trim>
+				{$threadActionsHtml}
+			</xf:trim></div>
+
+			<xf:macro name="thread_custom_fields_status"
+				arg-thread="{$thread}"
+				arg-forum="{$forum}"
+				arg-wrapperClass="block-outer" />
+		</xf:extension>
+
+		<div class="block-container">
+			<div class="block-body">
+				<xf:extension name="pinned_body">
+					<xf:macro name="{{ $templateOverrides.pinned_first_post_macro ?: 'post_macros::post' }}"
+						arg-post="{$pinnedPost}"
+						arg-thread="{$thread}"
+						arg-highlightedPosts="{$highlightedPosts}"
+						args="{$templateOverrides.pinned_first_post_macro_args}" />
+				</xf:extension>
+			</div>
+		</div>
+
+		<xf:extension name="pinned_outer_after"></xf:extension>
+	</div>
+</xf:if>
+
+<xf:extension name="above_messages_below_pinned"></xf:extension>
+
+<xf:extension name="message_block_classes" value="block--messages" />
+<div class="block {{ extension_value('message_block_classes') }}" data-xf-init="{{ $canInlineMod ? 'inline-mod' : '' }}" data-type="post" data-href="{{ link('inline-mod') }}" data-search-target="*">
+
+	<span class="u-anchorTarget" id="posts"></span>
+
+	<xf:if is="!$isFirstPostPinned">
+		<xf:macro name="thread_status" arg-thread="{$thread}" arg-wrapperClass="block-outer" />
+	</xf:if>
+
+	<div class="block-outer"><xf:extension name="messages_block_outer"><xf:trim>
+		<xf:pagenav
+			page="{$page}" perpage="{$perPage}" total="{$totalPosts}"
+			link="threads" data="{$thread}" params="{$pageNavFilters}" hash="{$pageNavHash}"
+			wrapperclass="block-outer-main" />
+
+			<xf:if is="!$isFirstPostPinned">
+				{$threadActionsHtml}
+			</xf:if>
+
+			<xf:if contentcheck="true">
+				<div class="block-outer-opposite">
+					<xf:contentcheck>{$postSortFilterHtml}</xf:contentcheck>
+				</div>
+			</xf:if>
+	</xf:trim></xf:extension></div>
+
+	<xf:extension name="messages_block_outer_secondary"></xf:extension>
+
+	<xf:if is="!$isFirstPostPinned">
+		<xf:macro name="thread_custom_fields_status"
+			arg-thread="{$thread}"
+			arg-forum="{$forum}"
+			arg-wrapperClass="block-outer" />
+	</xf:if>
+
+	<div class="block-container lbContainer"
+		data-xf-init="lightbox{{ $xf.options.selectQuotable ? ' select-to-quote' : '' }}"
+		data-message-selector=".js-post"
+		data-lb-id="thread-{$thread.thread_id}"
+		data-lb-universal="{$xf.options.lightBoxUniversal}">
+
+		<div class="block-body js-replyNewMessageContainer">
+			<xf:if is="$posts is not empty">
+				<xf:foreach loop="$posts" value="$post">
+
+					<xf:extension name="messages_block_body_before_post"></xf:extension>
+
+					<xf:if is="$post.message_state == 'deleted'">
+						<xf:macro name="{{ $templateOverrides.post_deleted_macro ?: 'post_macros::post_deleted' }}"
+							arg-post="{$post}"
+							arg-thread="{$thread}"
+							args="{$templateOverrides.post_deleted_macro_args}" />
+					<xf:else />
+						<xf:macro name="{{ $templateOverrides.post_macro ?: 'post_macros::post' }}"
+							arg-post="{$post}"
+							arg-thread="{$thread}"
+							arg-highlightedPosts="{$highlightedPosts}"
+							args="{$templateOverrides.post_macro_args}" />
+					</xf:if>
+
+					<xf:extension name="messages_block_body_after_post"></xf:extension>
+
+				</xf:foreach>
+			<xf:else />
+				<xf:if is="$filters">
+					<div class="message">
+						<div class="message-inner">
+							<div class="message-cell">
+								{{ phrase('there_no_posts_matching_your_filters') }}
+							</div>
+						</div>
+					</div>
+				</xf:if>
+			</xf:if>
+		</div>
+	</div>
+
+	<xf:if contentcheck="true">
+		<div class="block-outer block-outer--after">
+			<xf:contentcheck>
+				<xf:pagenav
+					page="{$page}" perpage="{$perPage}" total="{$totalPosts}"
+					link="threads" data="{$thread}" params="{$pageNavFilters}" hash="{$pageNavHash}"
+					wrapperclass="block-outer-main" />
+
+				<xf:showignored wrapperclass="block-outer-opposite" />
+				<xf:if is="
+					!$thread.canReply()
+					AND !$thread.canReplyPreReg()
+					AND $thread.discussion_state == 'visible'
+					AND $thread.discussion_open
+				">
+					<div class="block-outer-opposite">
+						<xf:if is="$xf.visitor.user_id">
+							<span class="button button--wrap is-disabled">
+								{{ phrase('no_permission_to_reply') }}
+								<!-- this is not interactive so shouldn't be a button element -->
+							</span>
+						<xf:else />
+							<xf:button href="{{ link('login') }}" class="button--link button--wrap" overlay="true">
+								{{ phrase('log_in_or_register_to_reply') }}
+							</xf:button>
+						</xf:if>
+					</div>
+				</xf:if>
+			</xf:contentcheck>
+		</div>
+	</xf:if>
+
+	<xf:macro name="thread_status" arg-thread="{$thread}" arg-wrapperClass="block-outer block-outer--after" />
+</div>
+
+<xf:ad position="thread_view_below_messages" arg-thread="{$thread}" />
+<xf:extension name="below_messages"></xf:extension>
+<xf:widgetpos id="thread_view_below_messages" context-thread="{$thread}" />
+
+<xf:set var="$isPreRegReply" value="{{ $thread.canReplyPreReg() }}" />
+<xf:if is="$thread.canReply() OR $isPreRegReply">
+	<xf:form action="{{ link('threads/add-reply', $thread) }}"
+		ajax="true"
+		draft="{{ link('threads/draft', $thread) }}"
+		class="block js-quickReply"
+		data-xf-init="attachment-manager quick-reply{{ ($xf.visitor.isShownCaptcha() AND !$isPreRegReply) ? ' guest-captcha' : '' }}"
+		data-message-container="div[data-type='post'] .js-replyNewMessageContainer">
+
+		<xf:js src="xf/message.js" min="1" />
+
+		<div class="block-container">
+			<div class="block-body">
+				<xf:macro template="quick_reply_macros" name="body"
+					arg-message="{$thread.draft_reply.message}"
+					arg-attachmentData="{$attachmentData}"
+					arg-forceHash="{$thread.draft_reply.attachment_hash}"
+					arg-messageSelector=".js-post"
+					arg-multiQuoteHref="{{ link('threads/multi-quote', $thread) }}"
+					arg-multiQuoteStorageKey="multiQuoteThread"
+					arg-lastDate="{$lastPost.post_date}"
+					arg-lastKnownDate="{$thread.last_post_date}"
+					arg-loadExtra="{$isSimpleDateDisplay}"
+					arg-showGuestControls="{{ !$isPreRegReply }}"
+					arg-previewUrl="{{ link('threads/reply-preview', $thread) }}"/>
+			</div>
+		</div>
+	</xf:form>
+</xf:if>
+
+<xf:widgetpos id="thread_view_below_quick_reply" context-thread="{$thread}" />
+<xf:extension name="below_quick_reply"></xf:extension>
+
+<div class="blockMessage blockMessage--none">
+	<xf:macro template="share_page_macros" name="buttons" arg-iconic="{{ true }}" arg-label="{{ phrase('share:') }}" />
+</div>
+
+<xf:extension name="below_share"></xf:extension>
+
+<xf:macro name="thread_status" arg-thread="!" arg-wrapperClass="">
+	<xf:if contentcheck="true">
+		<div class="{$wrapperClass}">
+			<dl class="blockStatus">
+				<dt>{{ phrase('status') }}</dt>
+				<xf:contentcheck>
+					<xf:if is="$thread.discussion_state == 'deleted'">
+						<dd class="blockStatus-message blockStatus-message--deleted">
+							<xf:macro template="deletion_macros" name="notice" arg-log="{$thread.DeletionLog}" />
+						</dd>
+					<xf:elseif is="$thread.discussion_state == 'moderated'" />
+						<dd class="blockStatus-message blockStatus-message--moderated">
+							{{ phrase('awaiting_approval_before_being_displayed_publicly') }}
+						</dd>
+					</xf:if>
+					<xf:if is="!$thread.discussion_open">
+						<dd class="blockStatus-message blockStatus-message--locked">
+							{{ phrase('not_open_for_further_replies') }}
+						</dd>
+					</xf:if>
+				</xf:contentcheck>
+			</dl>
+		</div>
+	</xf:if>
+</xf:macro>
+
+<xf:macro name="thread_custom_fields_status" arg-thread="!" arg-forum="!" arg-wrapperClass="">
+	<div class="{$wrapperClass} js-threadStatusField"><xf:trim>
+		<xf:if contentcheck="true">
+			<div class="blockStatus blockStatus--info">
+				<xf:contentcheck>
+					<xf:macro template="custom_fields_macros" name="custom_fields_view"
+						arg-type="threads"
+						arg-group="thread_status"
+						arg-onlyInclude="{$forum.field_cache}"
+						arg-set="{$thread.custom_fields}"
+						arg-wrapperClass="blockStatus-message" />
+				</xf:contentcheck>
+			</div>
+		</xf:if>
+	</xf:trim></div>
+</xf:macro>
+
+<xf:widgetpos id="thread_view_sidebar" context-thread="{$thread}" position="sidebar" />]]></template>
+    <template title="tqny.less" type="public" addon_id="" version_id="0" version_string=""><![CDATA[.ist-anaalan {
+margin-top: 20px;
+}
+.ist-kutu {
+display: flex;
+flex-wrap: wrap;
+margin-top: 10px;
+margin-bottom: 10px;
+}
+.ist-ic {
+flex:25%;
+}
+.ist-detay {
+background-color: #dedede;
+box-shadow: 0px 5px 10px -4px rgba(0,0,0,0.29);
+padding: 5px 20px 5px 5px;
+text-align: center;
+border-radius: 50px;
+}
+.fa-renk1 {
+background-color: #22a720;
+color: #c9c9c9;
+}
+.fa-renk2 {
+background-color: #204492;
+color: #c9c9c9;
+}
+.fa-renk3 {
+background-color: #a2b509;
+color: #c9c9c9;
+}
+.fa-renk4 {
+background-color: #f2930d;
+color: #c9c9c9;
+}
+.fa-icon {
+font-size: 30px;
+width: 50px;
+height: 50px;
+float: left;
+line-height: 50px;
+border-radius: 50px;
+}
+.ist-detay p {
+color: #272727;
+font-weight: 600;
+font-size: 20px;
+text-align: right;
+padding: 0;
+margin: 0;
+}
+.ist-anaalan .ist-kutu .ist-detay span {
+color: #a02828;
+text-align: right;
+display: block;
+}
+@media (min-width: 900px){
+.ist-anaalan .ist-kutu .ist-ic-bosluk:first-of-type,
+.ist-anaalan .ist-kutu .ist-ic-bosluk:nth-child(2),
+.ist-anaalan .ist-kutu .ist-ic-bosluk:nth-child(3)
+{padding-right: 5px;}}
+@media (max-width: 900px){
+.ist-anaalan .ist-kutu .ist-ic-bosluk:first-of-type,
+.ist-anaalan .ist-kutu
+.ist-ic-bosluk:nth-child(3) {
+padding-right: 5px;
+}}
+@media (max-width: 900px){
+.ist-anaalan .ist-kutu .ist-ic {
+flex: 0 0 50%;
+max-width: 50%;
+margin-bottom: 30px;
+}}]]></template>
+    <template title="widget_forum_statistics" type="public" addon_id="XF" version_id="2020771" version_string="2.2.7 Patch 1"><![CDATA[<xf:css src="tqny.less" />
+<div class="ist-anaalan"{{ widget_data($widget) }}>
+<div class="ist-kutu">
+<div class="ist-ic ist-ic-bosluk">
+<div class="ist-detay">
+<div class="fa-icon fa-renk1"><i class="fad fa-comment-lines"></i></div>
+<p class="sayi">{$forumStatistics.threads|number}</p>
+<span class="ist-bilgi">{{ phrase('threads') }}</span>
+</div>
+</div>
+<div class="ist-ic ist-ic-bosluk">
+<div class="ist-detay">
+<div class="fa-icon fa-renk2"><i class="fad fa-comments"></i></div>
+<p class="sayi">{$forumStatistics.messages|number}</p>
+<span class="ist-bilgi">{{ phrase('messages') }}</span>
+</div>
+</div>
+<div class="ist-ic ist-ic-bosluk">
+<div class="ist-detay">
+<div class="fa-icon fa-renk3"><i class="fad fa-users"></i></div>
+<p class="sayi">{$forumStatistics.users|number}</p>
+<span class="ist-bilgi">{{ phrase('members') }}</span>
+</div>
+</div>
+<div class="ist-ic ist-ic-bosluk">
+<div class="ist-detay">
+<div class="fa-icon fa-renk4"><i class="fad fa-users-medical"></i></div>
+<p><xf:username user="{$forumStatistics.latestUser}" /></p>
+<span class="ist-bilgi">{{ phrase('latest_member') }}</span>
+</div>
+</div>
+</div>
+</div>]]></template>
+    <template title="widget_members_online" type="public" addon_id="XF" version_id="2020870" version_string="2.2.8"><![CDATA[<xf:if is="$options.staffOnline">
+	<xf:if contentcheck="true">
+		<div class="block" data-widget-section="staffMembers"{{ widget_data($widget) }}>
+			<div class="block-container">
+				<h3 class="block-minorHeader"><a href="{{ link('members', null, {'key': 'staff_members'}) }}">{{ phrase('staff_online') }}</a></h3>
+				<ul class="block-body">
+				<xf:contentcheck>
+					<xf:foreach loop="$online.users" value="$user">
+						<xf:if is="$user.is_staff">
+							<li class="block-row">
+								<div class="contentRow">
+									<div class="contentRow-figure">
+										<xf:avatar user="$user" size="xs" />
+									</div>
+									<div class="contentRow-main contentRow-main--close">
+										<xf:username user="$user" rich="true" />
+										<div class="contentRow-minor">
+											<xf:usertitle user="$user" />
+										</div>
+									</div>
+								</div>
+							</li>
+						</xf:if>
+					</xf:foreach>
+				</xf:contentcheck>
+				</ul>
+			</div>
+		</div>
+	</xf:if>
+</xf:if>
+
+<div class="block" data-widget-section="onlineNow"{{ widget_data($widget) }}>
+	<div class="block-container">
+		<h3 class="block-minorHeader"><a href="{{ link('online') }}">{$title}</a></h3>
+		<div class="block-body">
+			<xf:if contentcheck="true">
+				<div class="block-row block-row--minor">
+					<h4 class="block-textHeader block-textHeader--scaled">
+						{{ phrase('people_you_follow') }}
+					</h4>
+					<ul class="listHeap">
+						<xf:contentcheck>
+							<xf:if is="$options.followedOnline">
+								<xf:foreach loop="$online.users" value="$user">
+									<xf:if is="in_array($user.user_id, $xf.visitor.Profile.following)">
+										<li>
+											<xf:avatar user="$user" size="xxs" img="true" />
+										</li>
+									</xf:if>
+								</xf:foreach>
+							</xf:if>
+						</xf:contentcheck>
+					</ul>
+				</div>
+
+				<div class="block-row block-row--minor">
+					<h4 class="block-textHeader block-textHeader--scaled">
+						{{ phrase('members') }}
+					</h4>
+			<xf:else />
+				<div class="block-row block-row--minor">
+			</xf:if>
+
+				<xf:if is="$online.users is not empty">
+					<ul class="listInline listInline--comma">
+						<xf:foreach loop="$online.users" value="$user"><xf:trim>
+							<li><xf:username user="$user" rich="true" class="{{ !$user.visible ? 'username--invisible' : '' }}" /></li>
+						</xf:trim></xf:foreach>
+					</ul>
+					<xf:if is="$online.counts.unseen">
+						<a href="{{ link('online') }}">{{ phrase('ellipsis_and_x_more', {'count': $online.counts.unseen}) }}</a>
+					</xf:if>
+				<xf:else />
+					{{ phrase('no_members_online_now') }}
+				</xf:if>
+			</div>
+		</div>
+		<div class="block-footer">
+			<span class="block-footer-counter">{{ phrase('online_now_x_members_y_guests_z',{
+				'total': number($online.counts.total),
+				'members': number($online.counts.members),
+				'guests': number($online.counts.guests)})
+			}}</span>
+			 </div>
+		<div class="block-footer">
+					<h2 class="block-textHeader block-textHeader--scaled">
+						<i class="fas fa-users-crown"></i> {{ phrase('membersgroups') }}
+					</h2>
+            <span class="block-group-key">
+                <span class="username--style5">مؤسس تقنى</span>,
+                <span class="username--style3">المدير العام</span>,
+                <span class="username--style4">المراقبون</span>,
+				<span class="username--style10">المشرفون</span>,
+                <span class="username--style6">تقنى V.I.P</span>,
+                <span class="username--style8">تقنى مبدع</span>,
+                <span class="username--style7">تقنى نشيط</span>,
+			    <span class="username--style2">تقنى جديد</span>,
+                <span class="username--style9">تقنى مطرود</span>,
+                <span class="username--style1">الزوار</span>,
+               </span>
+		</div>
+	</div>
+</div>]]></template>
+    <template title="xfrm_resource_view" type="public" addon_id="XFRM" version_id="2020370" version_string="2.2.3"><![CDATA[<xf:title>{{ prefix('resource', $resource, 'escaped') }}{$resource.title}</xf:title>
+
+<xf:set var="$descSnippet" value="{{ snippet($description.message, 250, {'stripBbCode': true}) }}" />
+
+<xf:macro template="metadata_macros" name="metadata"
+	arg-description="{$descSnippet}"
+	arg-shareUrl="{{ link('canonical:resources', $resource) }}"
+	arg-canonicalUrl="{{ link('canonical:resources', $resource) }}" />
+
+
+<xf:page option="ldJsonHtml">
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "CreativeWork",
+		"@id": "{{ link('canonical:resources', $resource)|escape('json') }}",
+		"name": "{$resource.title|escape('json')}",
+		"headline": "{$resource.title|escape('json')}",
+		"alternativeHeadline": "{$resource.tag_line|escape('json')}",
+		"description": "{$descSnippet|escape('json')}",
+		<xf:if is="$resource.isVersioned()">
+			"version": "{$resource.CurrentVersion.version_string|escape('json')}",
+		</xf:if>
+		<xf:if is="$xf.options.xfrmAllowIcons AND $resource.icon_date">
+			"thumbnailUrl": "{{ $resource.getIconUrl('s', true)|escape('json') }}",
+		</xf:if>
+		"dateCreated": "{{ date($resource.resource_date, 'c')|escape('json') }}",
+		"dateModified": "{{ date($resource.last_update, 'c')|escape('json') }}",
+		<xf:if is="$resource.rating_count">"aggregateRating": {
+			"@type": "AggregateRating",
+			"ratingCount": "{$resource.rating_count|escape('json')}",
+			"ratingValue": "{$resource.rating_avg|escape('json')}"
+		},</xf:if>
+		<xf:if is="$resource.hasViewableDiscussion()">
+			"discussionUrl": "{{ link('canonical:threads', $resource.Discussion)|escape('json') }}",
+		</xf:if>
+		"author": {
+			"@type": "Person",
+			"name": "{{ ($resource.User ? $resource.User.username : $resource.username)|escape('json') }}"
+		}
+	}
+	</script>
+</xf:page>
+
+<xf:if is="$iconError">
+	<div class="blockMessage blockMessage--error">{{ phrase('xfrm_new_icon_could_not_be_applied_try_later') }}</div>
+</xf:if>
+
+<xf:wrap template="xfrm_resource_wrapper">
+	<xf:set var="$pageSelected" value="overview" />
+</xf:wrap>
+
+<xf:macro template="lightbox_macros" name="setup" arg-canViewAttachments="{{ $resource.canViewUpdateImages() }}" />
+
+<div class="block">
+	<xf:if contentcheck="true">
+		<div class="block-outer">
+			<div class="block-outer-opposite">
+			<xf:contentcheck>
+				<xf:macro template="xfrm_resource_wrapper_macros" name="action_buttons" arg-resource="{$resource}" />
+			</xf:contentcheck>
+			</div>
+		</div>
+	</xf:if>
+	<div class="block-container">
+		<div class="block-body lbContainer js-resourceBody"
+			data-xf-init="lightbox"
+			data-lb-id="resource-{$resource.resource_id}"
+			data-lb-caption-desc="{{ $resource.User ? $resource.User.username : $resource.username }} &middot; {{ date_time($resource.resource_date) }}">
+
+			<div class="resourceBody">
+				<article class="resourceBody-main js-lbContainer">
+					<xf:macro template="custom_fields_macros" name="custom_fields_view"
+						arg-type="resources"
+						arg-group="above_info"
+						arg-onlyInclude="{$category.field_cache}"
+						arg-set="{$resource.custom_fields}"
+						arg-wrapperClass="resourceBody-fields resourceBody-fields--before" />
+
+					<xf:if is="$trimmedDescription">
+						{{ bb_code($trimmedDescription, 'resource_update', $description) }}
+
+						<div class="block-rowMessage block-rowMessage--important">
+							{{ phrase('xfrm_do_not_have_permission_to_view_full_content_of_this_resource') }}
+							<xf:if is="!$xf.visitor.user_id">
+								<a href="{{ link('login') }}" data-xf-click="overlay">{{ phrase('log_in_or_register_now') }}</a>
+							</xf:if>
+						</div>
+					<xf:else />
+						{{ bb_code($description.message, 'resource_update', $description) }}
+					</xf:if>
+
+					<xf:macro template="custom_fields_macros" name="custom_fields_view"
+						arg-type="resources"
+						arg-group="below_info"
+						arg-onlyInclude="{$category.field_cache}"
+						arg-set="{$resource.custom_fields}"
+						arg-wrapperClass="resourceBody-fields resourceBody-fields--after" />
+
+					<xf:if is="$description.attach_count">
+						<xf:if contentcheck="true">
+							<xf:css src="attachments.less" />
+							<ul class="attachmentList resourceBody-attachments">
+								<xf:contentcheck>
+									<xf:foreach loop="$description.Attachments" value="$attachment" if="!$description.isAttachmentEmbedded($attachment)">
+										<xf:macro template="attachment_macros" name="attachment_list_item"
+											arg-attachment="{$attachment}"
+											arg-canView="{{ $resource.canViewUpdateImages() }}" />
+									</xf:foreach>
+								</xf:contentcheck>
+							</ul>
+						</xf:if>
+					</xf:if>
+
+					<xf:if contentcheck="true">
+						<div class="actionBar">
+							<xf:contentcheck>
+								<xf:if contentcheck="true">
+									<div class="actionBar-set actionBar-set--external">
+									<xf:contentcheck>
+										<xf:react content="{$description}" link="resources/update/react" list="< .js-resourceBody | .js-reactionsList" />
+									</xf:contentcheck>
+									</div>
+								</xf:if>
+
+								<xf:if contentcheck="true">
+									<div class="actionBar-set actionBar-set--internal">
+									<xf:contentcheck>
+										<xf:if is="$description.canReport()">
+											<a href="{{ link('resources/update/report', $description) }}"
+												class="actionBar-action actionBar-action--report" data-xf-click="overlay">{{ phrase('report_verb') }}</a>
+										</xf:if>
+
+										<xf:set var="$hasActionBarMenu" value="{{ false }}" />
+										<xf:if is="$resource.canEdit()">
+											<a href="{{ link('resources/edit', $resource) }}"
+												class="actionBar-action actionBar-action--edit actionBar-action--menuItem">{{ phrase('edit') }}</a>
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										</xf:if>
+										<xf:if is="$description.edit_count && $description.canViewHistory()">
+											<a href="{{ link('resources/update/history', $description) }}"
+												class="actionBar-action actionBar-action--history actionBar-action--menuItem"
+												data-xf-click="toggle"
+												data-target="< .js-resourceBody | .js-historyTarget"
+												data-menu-closer="true">{{ phrase('history') }}</a>
+
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										</xf:if>
+										<xf:if is="$description.canDelete('soft')">
+											<a href="{{ link('resources/delete', $description) }}"
+												class="actionBar-action actionBar-action--delete actionBar-action--menuItem"
+												data-xf-click="overlay">{{ phrase('delete') }}</a>
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										</xf:if>
+										<xf:if is="$xf.visitor.canViewIps() && $description.ip_id">
+											<a href="{{ link('resources/update/ip', $description) }}"
+												class="actionBar-action actionBar-action--ip actionBar-action--menuItem"
+												data-xf-click="overlay">{{ phrase('ip') }}</a>
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										</xf:if>
+										<xf:if is="$description.canWarn()">
+											<a href="{{ link('resources/update/warn', $description) }}"
+												class="actionBar-action actionBar-action--warn actionBar-action--menuItem">{{ phrase('warn') }}</a>
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										<xf:elseif is="$description.warning_id && $xf.visitor.canViewWarnings()" />
+											<a href="{{ link('warnings', {'warning_id': $description.warning_id}) }}"
+												class="actionBar-action actionBar-action--warn actionBar-action--menuItem"
+												data-xf-click="overlay">{{ phrase('view_warning') }}</a>
+											<xf:set var="$hasActionBarMenu" value="{{ true }}" />
+										</xf:if>
+
+										<xf:if is="$hasActionBarMenu">
+											<a class="actionBar-action actionBar-action--menuTrigger"
+												data-xf-click="menu"
+												title="{{ phrase('more_options')|for_attr }}"
+												role="button"
+												tabindex="0"
+												aria-expanded="false"
+												aria-haspopup="true">&#8226;&#8226;&#8226;</a>
+
+											<div class="menu" data-menu="menu" aria-hidden="true" data-menu-builder="actionBar">
+												<div class="menu-content">
+													<h4 class="menu-header">{{ phrase('more_options') }}</h4>
+													<div class="js-menuBuilderTarget"></div>
+												</div>
+											</div>
+										</xf:if>
+									</xf:contentcheck>
+									</div>
+								</xf:if>
+							</xf:contentcheck>
+						</div>
+					</xf:if>
+
+					<div class="reactionsBar js-reactionsList {{ $description.reactions ? 'is-active' : '' }}">
+						<xf:reactions content="{$description}" link="resources/update/reactions" />
+					</div>
+
+					<xf:if is="$description.edit_count && $description.canViewHistory()">
+						<div class="js-historyTarget toggleTarget" data-href="trigger-href"></div>
+					</xf:if>
+				</article>
+
+				<div class="resourceBody-sidebar">
+					<div class="resourceSidebarGroup">
+						<dl class="pairs pairs--justified">
+							<dt>{{ phrase('author') }}</dt>
+							<dd><xf:username user="{$resource.User}" defaultname="{$resource.username}" /></dd>
+						</dl>
+						<xf:if is="$resource.isDownloadable()">
+							<dl class="pairs pairs--justified">
+								<dt>{{ phrase('xfrm_downloads') }}</dt>
+								<dd>{$resource.download_count|number}</dd>
+							</dl>
+						</xf:if>
+						<dl class="pairs pairs--justified">
+							<dt>{{ phrase('views') }}</dt>
+							<dd>{{ max($resource.view_count, $resource.download_count, 1)|number }}</dd>
+						</dl>
+						 <xf:if is="count($resource.CurrentVersion.Attachments) == 1">
+        <xf:set var="$attachment" value="{{ $resource.CurrentVersion.Attachments|first }}" />
+            <dl class="pairs pairs--justified">
+            <dt>نوع الملف</dt>
+            <dd>{{ $attachment.getExtension() }}</dd>
+        </dl>
+        <dl class="pairs pairs--justified">
+            <dt>حجم الملف</dt>
+            <dd>{{ $attachment.getFileSize()|file_size }}</dd>
+        </dl>
+    </xf:if>
+						<dl class="pairs pairs--justified">
+							<dt>{{ phrase('xfrm_first_release') }}</dt>
+							<dd><xf:date time="{$resource.resource_date}" /></dd>
+						</dl>
+						<dl class="pairs pairs--justified">
+							<dt>{{ phrase('xfrm_last_update') }}</dt>
+							<dd><xf:date time="{$resource.last_update}" /></dd>
+						</dl>
+						<dl class="pairs pairs--justified">
+							<dt>{{ phrase('rating') }}</dt>
+							<dd>
+								<xf:macro template="rating_macros" name="stars_text"
+									arg-rating="{$resource.rating_avg}"
+									arg-count="{$resource.rating_count}"
+									arg-rowClass="ratingStarsRow--textBlock" />
+							</dd>
+						</dl>
+					</div>
+
+					<xf:if contentcheck="true">
+						<div class="resourceSidebarGroup resourceSidebarGroup--buttons">
+							<xf:contentcheck>
+								<xf:if is="$resource.hasViewableDiscussion()">
+									<xf:button href="{{ link('threads', $resource.Discussion) }}" class="button--fullWidth">{{ phrase('xfrm_join_discussion') }}</xf:button>
+								</xf:if>
+
+								<xf:if is="$resource.external_url">
+									<xf:button href="{$resource.external_url}" class="button--link button--fullWidth">{{ phrase('xfrm_more_information') }}</xf:button>
+								</xf:if>
+
+								<xf:if is="$resource.alt_support_url AND $resource.Category.enable_support_url">
+									<xf:button href="{$resource.alt_support_url}" class="button--link button--fullWidth">{{ phrase('xfrm_get_support') }}</xf:button>
+								</xf:if>
+							</xf:contentcheck>
+						</div>
+					</xf:if>
+
+
+					<xf:if is="$resource.canViewTeamMembers() && $teamMembers is not empty">
+						<div class="resourceSidebarGroup">
+							<h4 class="resourceSidebarGroup-title">
+								<xf:if is="$resource.canManageTeamMembers()">
+									<a href="{{ link('resources/manage-team', $resource) }}" data-xf-click="overlay">
+										{{ phrase('xfrm_resource_team') }}
+									</a>
+								<xf:else />
+										{{ phrase('xfrm_resource_team') }}
+								</xf:if>
+							</h4>
+
+							<ul class="resourceSidebarList">
+								<xf:foreach loop="$teamMembers" value="$teamMember">
+									<li>
+										<div class="contentRow">
+											<div class="contentRow-figure">
+												<xf:avatar user="$teamMember.User" size="xxs" />
+											</div>
+
+											<div class="contentRow-main contentRow-main--close">
+												<xf:username user="$teamMember.User" rich="true" />
+												<div class="contentRow-minor">
+													<xf:usertitle user="$teamMember.User" />
+												</div>
+											</div>
+										</div>
+									</li>
+								</xf:foreach>
+							</ul>
+						</div>
+					</xf:if>
+
+					<xf:if is="$authorOthers is not empty">
+						<div class="resourceSidebarGroup">
+							<h4 class="resourceSidebarGroup-title">
+								<a href="{{ link('resources/authors', $resource.User) }}">{{ phrase('xfrm_more_resources_from_x', {'name': $resource.User.username}) }}</a>
+							</h4>
+							<ul class="resourceSidebarList">
+							<xf:foreach loop="$authorOthers" value="$authorOther">
+								<li>
+									<xf:macro template="xfrm_resource_list_macros" name="resource_simple"
+										arg-resource="{$authorOther}"
+										arg-withMeta="{{ false }}" />
+								</li>
+							</xf:foreach>
+							</ul>
+						</div>
+					</xf:if>
+
+					<xf:if contentcheck="true">
+						<div class="resourceSidebarGroup">
+							<h4 class="resourceSidebarGroup-title">{{ phrase('xfrm_share_this_resource') }}</h4>
+							<xf:contentcheck>
+								<xf:macro template="share_page_macros" name="buttons" arg-iconic="{{ true }}" />
+							</xf:contentcheck>
+						</div>
+					</xf:if>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<xf:if is="$latestUpdates is not empty">
+	<div class="block">
+		<div class="block-container">
+			<h3 class="block-header">{{ phrase('xfrm_latest_updates') }}</h3>
+			<ol class="block-body">
+			<xf:foreach loop="$latestUpdates" value="$update">
+				<li class="block-row block-row--separated">
+					<h3 class="block-textHeader">
+						<a href="{{ link('resources/update', $update) }}">{$update.title}</a>
+					</h3>
+					<div>{{ snippet($update.message, 100, {'stripBbCode': true}) }}</div>
+			</xf:foreach>
+			</ol>
+			<div class="block-footer">
+				<span class="block-footer-controls"><xf:button class="button--link" href="{{ link('resources/updates', $resource) }}">{{ phrase('xfrm_read_more...') }}</xf:button></span>
+			</div>
+		</div>
+	</div>
+</xf:if>
+
+<xf:if is="$latestReviews is not empty">
+	<div class="block">
+		<div class="block-container">
+			<h3 class="block-header">{{ phrase('xfrm_latest_reviews') }}</h3>
+			<div class="block-body">
+			<xf:foreach loop="$latestReviews" value="$review">
+				<xf:macro template="xfrm_resource_review_macros" name="review"
+					arg-review="{$review}"
+					arg-resource="{$resource}" />
+			</xf:foreach>
+			</div>
+			<div class="block-footer">
+				<span class="block-footer-controls"><xf:button class="button--link" href="{{ link('resources/reviews', $resource) }}">{{ phrase('xfrm_read_more...') }}</xf:button></span>
+			</div>
+		</div>
+	</div>
+</xf:if>]]></template>
+    <template title="xtr_externallink_redirecting" type="public" addon_id="XENTR/ExternalLink" version_id="1000170" version_string="1.0.1"><![CDATA[<xf:title>{{phrase('xtr_externallink_redirect')}}</xf:title>
+
+<xf:css src="xtr_ExternalLink.less" />
+<xf:include template="xtr_ExternalLink.js" />
+
+<xf:ad position="xtr_externallink_header" />
+<xf:h1 hidden="true" />
+
+<div class="externallink block">
+	<div class="block-container">
+		<h3 class="block-minorHeader">{{phrase('xtr_externallink_redirecting_auto')}}</h3>
+		<div class="block-body">
+			<i class="{{ property('xtr_external_link_icon') }} fa-{{ property('xtr_externallink_icon_size') }}x"></i>
+				</div>
+				<div class="p-description">{{phrase('xtr_externallink_redirecting_message')}}</div>
+				<xf:if is="{$xf.options.xtr_redirect_external_countdown}">
+					<div class="p-circle">
+						<div class="circle">
+					    	<div class="count"><span id="xtr_externallink_timer">{$xf.options.xtr_externallink_timer}</span></div>
+							<div class="l-half"></div>
+							<div class="r-half"></div>
+						</div>		
+					</div>
+				</xf:if>
+				<xf:if is="{$xf.options.xtr_redirect_cancel_button} == 0">
+					<xf:button class="reject-redirect button" icon="cancel">
+						{{ phrase('cancel') }}
+					</xf:button>
+				</xf:if>
+				
+				<xf:if is="{$xf.options.xtr_redirect_cont_button} == 0">
+					<xf:button href="{$url}" rel="nofollow" class="button--cta" icon="redirect">
+						{{phrase('xtr_externallink_redirecting_continue')}}
+					</xf:button>
+				</xf:if>
+			</div>
+		</div>	
+	</div>
+</div>]]></template>
+  </templates>
+  <properties>
+    <property property_name="fontAwesomeWeight" group_name="fonts" title="Font Awesome weight" description="" property_type="value" value_type="radio" depends_on="" value_group="weight" display_order="2300" addon_id="XF">
+      <value_parameters>300={{ phrase('weight_light') }}
+400={{ phrase('weight_regular') }}
+900={{ phrase('weight_solid') }}</value_parameters>
+      <value>"900"</value>
+    </property>
+    <property property_name="fontFamilyBody" group_name="fonts" title="Body Text Font" description="This font is used for the text of messages etc." property_type="value" value_type="string" depends_on="" value_group="font" display_order="200" addon_id="XF">
+      <value>"Droid Arabic Kufi"</value>
+    </property>
+    <property property_name="fontFamilyCode" group_name="fonts" title="Code Font" description="The font list used for mono-spaced text input and output" property_type="value" value_type="string" depends_on="" value_group="font" display_order="300" addon_id="XF">
+      <value>"Droid Arabic Kufi"</value>
+    </property>
+    <property property_name="fontFamilyUi" group_name="fonts" title="User Interface Font" description="The font list for your main text" property_type="value" value_type="string" depends_on="" value_group="font" display_order="100" addon_id="XF">
+      <value>"Droid Arabic Kufi"</value>
+    </property>
+    <property property_name="messageUserElements" group_name="message" title="Message user info elements" description="The elements selected here will be displayed in the message user info block. It will not be displayed below the single column width." property_type="value" value_type="template" depends_on="" value_group="user" display_order="600" addon_id="XF">
+      <value_parameters>template=style_property_template_messageUserElements
+type=array</value_parameters>
+      <value>{
+    "register_date": "1",
+    "message_count": "1",
+    "solutions": "1",
+    "reaction_score": "1",
+    "trophy_points": "1",
+    "age": "1",
+    "location": "1",
+    "website": "1",
+    "custom_fields": "1"
+}</value>
+    </property>
+    <property property_name="nodeListDescriptionDisplay" group_name="nodeList" title="Description display style" description="To save vertical space, it is possible to hide node descriptions until the node title is hovered, at which point they are displayed in a tooltip" property_type="value" value_type="radio" depends_on="" value_group="" display_order="400" addon_id="XF">
+      <value_parameters>tooltip={{ phrase('tooltip') }}
+inline={{ phrase('inline') }}
+none={{ phrase('none') }}</value_parameters>
+      <value>"inline"</value>
+    </property>
+    <property property_name="nodeListSubDisplay" group_name="nodeList" title="Sub-forums display style" description="Choose the style in which sub-forums will be displayed within a particular node element, according to the amount of space you want them to occupy" property_type="value" value_type="radio" depends_on="" value_group="" display_order="300" addon_id="XF">
+      <value_parameters>menu={{ phrase('popup_menu') }}
+flat={{ phrase('listed_below_node') }}
+none={{ phrase('none') }}</value_parameters>
+      <value>"flat"</value>
+    </property>
+    <property property_name="publicFaviconUrl" group_name="basic" title="Favicon URL (32x32)" description="Path to the small logo that is associated with bookmarks pointing to your site. This is expected to be a 32x32 PNG image." property_type="value" value_type="string" depends_on="" value_group="logo" display_order="400" addon_id="XF">
+      <value_parameters>asset=logo</value_parameters>
+      <value>"data/assets/logo/favicon-32x32.png"</value>
+    </property>
+    <property property_name="publicIconUrl" group_name="basic" title="Icon URL (192x192)" description="The path to your icon image. This should be a 192x192 image and usually a PNG." property_type="value" value_type="string" depends_on="" value_group="logo" display_order="210" addon_id="XF">
+      <value_parameters>asset=logo</value_parameters>
+      <value>"data/assets/logo/android-chrome-192x192.png"</value>
+    </property>
+    <property property_name="publicIconUrlLarge" group_name="basic" title="Icon URL (512x512)" description="The path to your large icon image. This should be a 512x512 image and usually a PNG." property_type="value" value_type="string" depends_on="" value_group="logo" display_order="220" addon_id="XF">
+      <value_parameters>asset=logo</value_parameters>
+      <value>"data/assets/logo/android-chrome-512x512.png"</value>
+    </property>
+    <property property_name="publicIconsMaskable" group_name="basic" title="Icons are maskable" description="If enabled, you are indicating that the icons above respect the &lt;a href=&quot;https://web.dev/maskable-icon/&quot; target=&quot;_blank&quot;&gt;minimum safe zone&lt;/a&gt; and can be cropped to the appropriate icon size for various devices." property_type="value" value_type="boolean" depends_on="" value_group="logo" display_order="230" addon_id="XF">
+      <value>1</value>
+    </property>
+    <property property_name="publicMetadataLogoUrl" group_name="basic" title="Metadata logo URL" description="Path to the metadata / OpenGraph logo used by your site on social media" property_type="value" value_type="string" depends_on="" value_group="logo" display_order="300" addon_id="XF">
+      <value_parameters>asset=logo</value_parameters>
+      <value>""</value>
+    </property>
+    <property property_name="scrollJumpButtons" group_name="page" title="Display page jump buttons on scroll" description="If enabled, floating buttons will be displayed shortly after the page is scrolled which allow you to jump to the top or bottom of the page. If this is only triggered when scrolling up, only a jump to top button will be displayed." property_type="value" value_type="radio" depends_on="" value_group="" display_order="3000" addon_id="XF">
+      <value_parameters>={{ phrase('scroll_buttons_do_not_display') }}
+up={{ phrase('scroll_buttons_when_scrolling_up') }}
+both={{ phrase('scroll_buttons_when_scrolling_up_or_down') }}</value_parameters>
+      <value>"both"</value>
+    </property>
+    <property property_name="styleType" group_name="palette" title="Style type" description="This defines the general type of style in use based on whether the content is placed on a light or dark background. This may change how colors are selected in certain scenarios." property_type="value" value_type="radio" depends_on="" value_group="setup" display_order="100" addon_id="XF">
+      <value_parameters>light={{ phrase('light') }}
+dark={{ phrase('dark') }}</value_parameters>
+      <value>"light"</value>
+    </property>
+    <property property_name="tn_mobile" group_name="cxfTopNavigation" title="Show top navigation on mobile" description="" property_type="value" value_type="radio" depends_on="" value_group="Mobile" display_order="25" addon_id="BassMan/TopNavigation">
+      <value_parameters>enabled={{ phrase('enabled') }}
+disabled={{ phrase('disabled') }}</value_parameters>
+      <value>"enabled"</value>
+    </property>
+    <property property_name="tn_mobile_sticky" group_name="cxfTopNavigation" title="Sticky top navigation on mobile" description="Note: Sticky top navigation option above must be enabled." property_type="value" value_type="radio" depends_on="" value_group="Mobile" display_order="27" addon_id="BassMan/TopNavigation">
+      <value_parameters>enabled={{ phrase('enabled') }}
+disabled={{ phrase('disabled') }}</value_parameters>
+      <value>"enabled"</value>
+    </property>
+    <property property_name="tn_sticky" group_name="cxfTopNavigation" title="Sticky top navigation" description="Note: add at least one top link or move elements to top navigation below." property_type="value" value_type="radio" depends_on="" value_group="stickyTop" display_order="10" addon_id="BassMan/TopNavigation">
+      <value_parameters>enabled={{ phrase('enabled') }}
+disabled={{ phrase('disabled') }}</value_parameters>
+      <value>"enabled"</value>
+    </property>
+    <property property_name="tn_visitorTabs" group_name="cxfTopNavigation" title="Move elements to top navigation" description="Note: elements will not show in top navigation on mobile view" property_type="value" value_type="radio" depends_on="" value_group="MoveElements" display_order="20" addon_id="BassMan/TopNavigation">
+      <value_parameters>VisitorTabs=Visitor Tabs only
+SearchTab=Search Tab only
+VisitorTabsAndSearch=Visitor Tabs AND Search tab
+none={{ phrase('none') }}</value_parameters>
+      <value>"VisitorTabsAndSearch"</value>
+    </property>
+    <property property_name="xtr_external_breadcrumbs" group_name="xtr_external_links_redirect" title="Hide Breadcrumb" description="Hide or show breadcrumb when redirecting." property_type="value" value_type="boolean" depends_on="" value_group="Breadcrumbs" display_order="10" addon_id="XENTR/ExternalLink">
+      <value>0</value>
+    </property>
+  </properties>
+</style>
